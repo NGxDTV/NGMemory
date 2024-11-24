@@ -12,13 +12,6 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <TargetFramework>net472</TargetFramework>
-    <PackageId>NGMemory</PackageId>
-    <Version>1.0.0</Version>
-    <Authors>NGxD TV</Authors>
-    <Company></Company>
-    <Description>NGMemory is a library designed to facilitate memory management and debugging tasks for external processes. It provides functionality to scan memory regions for specific patterns, retrieve module base addresses, manipulate CPU registers during debugging sessions, and perform read/write operations in another process's memory. The library simplifies complex memory operations with intuitive APIs, ensuring efficiency and reliability in debugging and automation use cases.</Description>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,6 +29,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PreferNativeArm64>true</PreferNativeArm64>
+    <GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

@@ -1,4 +1,8 @@
 .vs/
 NGMemory/bin/Debug/*.*
+NGMemory/bin/Release/*.*
 NGMemory/obj/Debug/*.*
-NGMemory/NGMemory.1.0.0.nupkg
+NGMemory/obj/Release/*.*
+NGMemory/Nuget/
+NGMemory/Properties/*.*
+/NGMemory/Properties
