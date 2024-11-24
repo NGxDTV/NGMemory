@@ -1,6 +1,6 @@
 # NGMemory
 
-NGMemory is a powerful C# library for external process memory manipulation and debugging. It allows developers to interact with other processes' memory regions, retrieve data, and manipulate memory in real-time.
+NGMemory is a C# library that makes working with external process memory simple and intuitive. Whether you’re building debugging tools or experimenting with memory manipulation, it gives you the power to read, analyze, and modify memory in real-time with ease.
 
 ## Features
 - **Memory Scanning**: Locate patterns in memory with byte-level precision.
@@ -61,6 +61,9 @@ MessageBox.Show($"Register RAX Value: {registerValue:X}");
 ```Console
     Register RAX Value: 0x1C741FA3310
 ```
+
+## Nuget Download
+https://www.nuget.org/packages/NGMemory/1.0.0
 
 ## Contributing
 Feel free to fork this repository and contribute by submitting pull requests. Issues and feature requests are welcome!
