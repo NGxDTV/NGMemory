@@ -4,5 +4,3 @@ NGMemory/bin/Release/*.*
 NGMemory/obj/Debug/*.*
 NGMemory/obj/Release/*.*
 NGMemory/Nuget/
-NGMemory/Properties/*.*
-/NGMemory/Properties
