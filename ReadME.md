@@ -31,7 +31,7 @@ MessageBox.Show(result.HasValue ? $"Pattern found at: {result.Value.ToString("X"
 MessageBox.Show(result2.HasValue ? $"Pattern found at: {result2.Value.ToString("X")}" : "Pattern not found.");
 ```
 #### Result:
-```
+```Console
 Pattern found at: 7FFB7F1ED715
 Pattern found at: 7FFB7F1ED715
 ```
