@@ -27,11 +27,20 @@ namespace NGMemory
         public const uint THREAD_ALL_ACCESS = 0x1F03FF;
         public const uint DBG_CONTINUE = 0x00010002;
         public const uint DBG_EXCEPTION_NOT_HANDLED = 0x80010001;
-        public const uint EXCEPTION_DEBUG_EVENT = 1;
         public const uint EXCEPTION_BREAKPOINT = 0x80000003;
         public const uint PROCESS_ALL_ACCESS = 0x1F0FFF;
         public const uint CONTEXT_DEBUG_REGISTERS = 0x00000010;
         public const uint EXCEPTION_SINGLE_STEP = 0x80000004;
+
+        public const uint EXCEPTION_DEBUG_EVENT = 1;
+        public const uint CREATE_THREAD_DEBUG_EVENT = 2;
+        public const uint CREATE_PROCESS_DEBUG_EVENT = 3;
+        public const uint EXIT_THREAD_DEBUG_EVENT = 4;
+        public const uint EXIT_PROCESS_DEBUG_EVENT = 5;
+        public const uint LOAD_DLL_DEBUG_EVENT = 6;
+        public const uint UNLOAD_DLL_DEBUG_EVENT = 7;
+        public const uint OUTPUT_DEBUG_STRING_EVENT = 8;
+        public const uint RIP_EVENT = 9;
 
 
         [StructLayout(LayoutKind.Sequential)]

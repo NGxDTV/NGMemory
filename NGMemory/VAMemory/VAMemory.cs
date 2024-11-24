@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
@@ -556,6 +558,12 @@ namespace NGMemory
 
                 return 0.0;
             }
+        }
+
+        public bool WriteByteArray(IntPtr pOffset, string pBytes)
+        {
+            byte[] bytes = pBytes.Split(' ').Select((string s) => byte.Parse(s, NumberStyles.HexNumber)).ToArray();
+            return WriteByteArray(pOffset, bytes);
         }
 
         public bool WriteByteArray(IntPtr pOffset, byte[] pBytes)

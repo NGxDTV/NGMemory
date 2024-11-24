@@ -101,6 +101,8 @@ namespace NGMemory
                     return 0;
                 }
 
+                DebugSetProcessKillOnExit(false);
+
                 context.Dr0 = (ulong)targetAddress.ToInt64();
                 context.Dr7 = 0x1;
 

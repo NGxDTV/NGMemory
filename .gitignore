@@ -1,6 +1,4 @@
 .vs/
-NGMemory/bin/Debug/*.*
-NGMemory/bin/Release/*.*
-NGMemory/obj/Debug/*.*
-NGMemory/obj/Release/*.*
+NGMemory/obj/
 NGMemory/Nuget/
+NGMemory\bin
