@@ -63,7 +63,7 @@ MessageBox.Show($"Register RAX Value: {registerValue:X}");
 ```
 
 ## Nuget Download
-https://www.nuget.org/packages/NGMemory/1.0.0
+https://www.nuget.org/packages/NGMemory/1.0.2
 
 ## Contributing
 Feel free to fork this repository and contribute by submitting pull requests. Issues and feature requests are welcome!
