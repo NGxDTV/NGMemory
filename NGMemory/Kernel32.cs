@@ -9,9 +9,12 @@ namespace NGMemory
 {
     public class Kernel32
     {
+        public delegate bool EnumDelegate(IntPtr hWnd, IntPtr lParam);
+
         public const uint PROCESS_QUERY_INFORMATION = 0x0400;
         public const uint PROCESS_VM_READ = 0x0010;
-        public const uint MEM_COMMIT = 0x00001000;
+        public const uint MEM_COMMIT = 0x1000;
+        public const uint MEM_RELEASE = 0x8000;
         public const uint PAGE_NOACCESS = 0x01;
         public const uint PAGE_READONLY = 0x02;
         public const uint PAGE_READWRITE = 0x04;
@@ -28,7 +31,7 @@ namespace NGMemory
         public const uint DBG_CONTINUE = 0x00010002;
         public const uint DBG_EXCEPTION_NOT_HANDLED = 0x80010001;
         public const uint EXCEPTION_BREAKPOINT = 0x80000003;
-        public const uint PROCESS_ALL_ACCESS = 0x1F0FFF;
+        public const uint PROCESS_ALL_ACCESS = (uint)(0x000F0000L | 0x00100000L | 0xFFF);
         public const uint CONTEXT_DEBUG_REGISTERS = 0x00000010;
         public const uint EXCEPTION_SINGLE_STEP = 0x80000004;
 
@@ -41,6 +44,24 @@ namespace NGMemory
         public const uint UNLOAD_DLL_DEBUG_EVENT = 7;
         public const uint OUTPUT_DEBUG_STRING_EVENT = 8;
         public const uint RIP_EVENT = 9;
+
+        public const uint WM_SETTEXT = 0x000C;
+        public const int CB_SETCURSEL = 0x014E;
+        public const int WM_KEYDOWN = 0x0100;
+        public const int BM_CLICK = 0x00F5;
+        public const int WM_ACTIVATE = 0x0006;
+        public const int VK_DOWN = 0x28;
+        public const uint WM_LBUTTONDOWN = 0x0201;
+        public const uint WM_LBUTTONUP = 0x0202;
+        public const int LB_SETCURSEL = 0x0186;
+
+        public const int WM_GETTEXT = 0x0D;
+        public const int WM_GETTEXTLENGTH = 0x0E;
+        public const int LVM_GETITEM = 0x1005;
+        public const int LVM_SETITEM = 0x1006;
+        public const int LVIF_TEXT = 0x0001;
+        public const int LVM_GETITEMCOUNT = 0x1004;
+        public const int LVM_GETITEMTEXT = 0x1073;
 
 
         [StructLayout(LayoutKind.Sequential)]
@@ -76,6 +97,19 @@ namespace NGMemory
             public uint NumberParameters;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 15)]
             public ulong[] ExceptionInformation;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct LV_ITEM
+        {
+            public uint mask;
+            public int iItem;
+            public int iSubItem;
+            public uint state;
+            public uint stateMask;
+            public IntPtr pszText;
+            public int cchTextMax;
+            public int iImage;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -276,5 +310,62 @@ namespace NGMemory
 
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool DebugSetProcessKillOnExit(bool KillOnExit);
+
+        [DllImport("user32.dll", SetLastError = false)] 
+        public static extern IntPtr GetDlgItem(IntPtr hDlg, int nIDDlgItem);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = false)] 
+        public static extern IntPtr SendMessage(HandleRef hWnd, uint Msg, IntPtr wParam, StringBuilder lParam);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = false)] 
+        public static extern IntPtr SendMessage(HandleRef hWnd, uint Msg, IntPtr wParam, string lParam);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)] 
+        public static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("user32.dll")] 
+        public static extern bool SendMessage(IntPtr hWnd, Int32 msg, Int32 wParam, IntPtr lParam);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        public static extern int GetWindowTextLength(IntPtr hWnd);
+
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)] 
+        public static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+
+        [DllImport("user32.dll")]
+        public static extern bool EnumThreadWindows(int dwThreadId, EnumDelegate lpfn, IntPtr lParam);
+        
+        [DllImport("user32.dll")] 
+        public static extern IntPtr FindWindowEx(IntPtr parentHWnd, IntPtr childAfterHWnd, string className, string windowTitle);
+        
+        [DllImport("user32.dll")] 
+        public static extern bool PostMessage(IntPtr hWnd, uint Msg, int wParam, int lParam);
+
+        [DllImport("user32.dll")][return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        [DllImport("user32.dll")] 
+        public static extern int SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")] 
+        public static extern int SetActiveWindow(IntPtr hWnd);
+
+        [DllImport("user32")] 
+        public static extern IntPtr GetWindowThreadProcessId(IntPtr hWnd, out int lpwdProcessID);
+
+        [DllImport("kernel32")]
+        public static extern IntPtr VirtualAllocEx(IntPtr hProcess, IntPtr lpAddress, int dwSize, uint flAllocationType, uint flProtect);
+
+        [DllImport("kernel32")]
+        public static extern bool VirtualFreeEx(IntPtr hProcess, IntPtr lpAddress, int dwSize, uint dwFreeType);
+
+        [DllImport("kernel32")]
+        public static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, ref LV_ITEM buffer, int dwSize, IntPtr lpNumberOfBytesWritten);
+
+        [DllImport("kernel32")] 
+        public static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, IntPtr lpBuffer, int dwSize, IntPtr lpNumberOfBytesRead);
     }
 }
