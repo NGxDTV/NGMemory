@@ -79,6 +79,10 @@
     <Compile Include="Scanner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VAMemory\VAMemory.cs" />
+    <Compile Include="WinInteropTools\CheckBox.cs" />
+    <Compile Include="WinInteropTools\GuiInteropHandler.cs" />
+    <Compile Include="WinInteropTools\SysListView32.cs" />
+    <Compile Include="WinInteropTools\TextBox.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\Settings.settings">
@@ -86,5 +90,6 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
