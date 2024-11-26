@@ -46,7 +46,6 @@ namespace NGMemory
         public const uint RIP_EVENT = 9;
 
         public const uint WM_SETTEXT = 0x000C;
-        public const int CB_SETCURSEL = 0x014E;
         public const int WM_KEYDOWN = 0x0100;
         public const int BM_CLICK = 0x00F5;
         public const int WM_ACTIVATE = 0x0006;
@@ -62,6 +61,12 @@ namespace NGMemory
         public const int LVIF_TEXT = 0x0001;
         public const int LVM_GETITEMCOUNT = 0x1004;
         public const int LVM_GETITEMTEXT = 0x1073;
+
+        public const int CB_GETCURSEL = 0x0147;
+        public const int CB_GETLBTEXT = 0x0148;
+        public const int CB_GETCOUNT = 0x0146;
+        public const int CB_SELECTSTRING = 0x014D;
+        public const int CB_SETCURSEL = 0x014E;
 
 
         [StructLayout(LayoutKind.Sequential)]
@@ -325,6 +330,9 @@ namespace NGMemory
 
         [DllImport("user32.dll")] 
         public static extern bool SendMessage(IntPtr hWnd, Int32 msg, Int32 wParam, IntPtr lParam);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, StringBuilder lParam);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
