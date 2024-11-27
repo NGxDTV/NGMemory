@@ -67,16 +67,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DebugHook.cs" />
-    <Compile Include="Kernel32.cs" />
-    <Compile Include="MessageHelper.cs" />
-    <Compile Include="Module.cs" />
+    <Compile Include="NGMemory\Constants.cs" />
+    <Compile Include="NGMemory\DebugHook.cs" />
+    <Compile Include="NGMemory\Enums.cs" />
+    <Compile Include="NGMemory\Kernel32.cs" />
+    <Compile Include="NGMemory\MessageHelper.cs" />
+    <Compile Include="NGMemory\Module.cs" />
+    <Compile Include="NGMemory\Scanner.cs" />
+    <Compile Include="NGMemory\Structures.cs" />
+    <Compile Include="NGMemory\User32.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Scanner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VAMemory\VAMemory.cs" />
     <Compile Include="WinInteropTools\CheckBox.cs" />

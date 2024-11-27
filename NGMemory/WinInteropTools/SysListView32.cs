@@ -7,6 +7,11 @@ using System.Threading.Tasks;
 using static NGMemory.Kernel32;
 using System.Windows.Forms;
 
+using static NGMemory.Structures;
+using static NGMemory.User32;
+using static NGMemory.Constants;
+using static NGMemory.Enums;
+
 namespace NGMemory.WinInteropTools
 {
     public class SysListView32

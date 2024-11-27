@@ -8,6 +8,11 @@ using System.Threading.Tasks;
 using static NGMemory.Kernel32;
 using static NGMemory.MessageHelper;
 
+using static NGMemory.Structures;
+using static NGMemory.User32;
+using static NGMemory.Constants;
+using static NGMemory.Enums;
+
 namespace NGMemory
 {
     public class DebugHook
