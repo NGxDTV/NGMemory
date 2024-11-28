@@ -20,5 +20,12 @@ namespace NGMemory.WinInteropTools
             IntPtr result = SendMessage(getRef(Pointer, Steuerelement), BM_GETCHECK, IntPtr.Zero, new StringBuilder());
             return result.ToInt32() == 1;
         }
+
+        public static void SetCheckBoxState(IntPtr Pointer, int Steuerelement, bool isChecked)
+        {
+            int state = isChecked ? BST_CHECKED : BST_UNCHECKED;
+            SendMessage(getRef(Pointer, Steuerelement), BM_SETCHECK, (IntPtr)state, "");
+        }
+
     }
 }

@@ -40,14 +40,32 @@ namespace NGMemory.WinInteropTools
             return items;
         }
 
-        public static void SetSelectedItem(IntPtr hWnd, string item)
+        public static void SetSelectedItem(IntPtr hWndComboBox, string item)
         {
-            SendMessage(hWnd, CB_SELECTSTRING, IntPtr.Zero, new StringBuilder(item));
+            const uint CB_SELECTSTRING = 0x014D;
+            const int WM_COMMAND = 0x0111;
+            const int CBN_SELCHANGE = 1;
+
+            SendMessage(hWndComboBox, CB_SELECTSTRING, new IntPtr(-1), item);
+            IntPtr hWndParent = GetParent(hWndComboBox);
+            int controlId = GetDlgCtrlID(hWndComboBox);
+            SendMessage(hWndParent, WM_COMMAND, MAKELPARAM(controlId, CBN_SELCHANGE), hWndComboBox);
         }
 
-        public static void SetSelectedIndex(IntPtr hWnd, int index)
+        public static void SetSelectedIndex(IntPtr hWndComboBox, int index)
         {
-            SendMessage(hWnd, CB_SETCURSEL, new IntPtr(index), IntPtr.Zero);
+            const int CBN_SELCHANGE = 1;
+
+            SendMessage(hWndComboBox, CB_SETCURSEL, new IntPtr(index), IntPtr.Zero);
+            IntPtr hWndParent = GetParent(hWndComboBox);
+            int controlId = GetDlgCtrlID(hWndComboBox);
+            SendMessage(hWndParent, WM_COMMAND, MAKELPARAM(controlId, CBN_SELCHANGE), hWndComboBox);
         }
+
+        public static IntPtr MAKELPARAM(int low, int high)
+        {
+            return (IntPtr)((high << 16) | (low & 0xFFFF));
+        }
+
     }
 }

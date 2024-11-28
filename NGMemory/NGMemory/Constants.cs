@@ -179,5 +179,8 @@ namespace NGMemory
         public const int WS_VISIBLE = 0x10000000;
         public const int WS_BORDER = 0x00800000;
         public const int WS_EX_CLIENTEDGE = 0x00000200;
+
+        public const int BST_CHECKED = 1;
+        public const int BST_UNCHECKED = 0;
     }
 }
