@@ -79,5 +79,14 @@ namespace NGMemory.Easy
             if (hWnd != IntPtr.Zero) FocusWindow(hWnd);
             return hWnd;
         }
+
+        /// <summary>
+        /// Ermittelt ein Fenster eines Prozesses (per Name).
+        /// </summary>
+        public static IntPtr Find(string processName, string partialTitle = null)
+        {
+            IntPtr hWnd = GetMainWindow(processName, partialTitle);
+            return hWnd;
+        }
     }
 }
