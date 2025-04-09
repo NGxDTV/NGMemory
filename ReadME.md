@@ -123,7 +123,8 @@ NGMemory.Easy.EasyFormHelper.SetCheckBoxes(windowHandle, new Dictionary<int, boo
 {
     { 0x1001, true },
     { 0x1002, false }
-});```
+});
+```
 
 ### 2. Reading and Updating a TextBox
 ```csharp
