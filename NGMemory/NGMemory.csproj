@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -67,6 +67,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Easy\EasyCheckBox.cs" />
+    <Compile Include="Easy\EasyComboBox.cs" />
+    <Compile Include="Easy\EasyDebugHook.cs" />
+    <Compile Include="Easy\EasyEnums.cs" />
+    <Compile Include="Easy\EasyFormHelper.cs" />
+    <Compile Include="Easy\EasyGuiInterop.cs" />
+    <Compile Include="Easy\EasySysListView32.cs" />
+    <Compile Include="Easy\EasyTextBox.cs" />
+    <Compile Include="Easy\EasyWindow.cs" />
     <Compile Include="NGMemory\Constants.cs" />
     <Compile Include="NGMemory\DebugHook.cs" />
     <Compile Include="NGMemory\Enums.cs" />

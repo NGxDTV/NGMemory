@@ -1,128 +1,203 @@
 # NGMemory
 
-NGMemory is a powerful yet easy-to-use C# library designed to simplify working with external process memory. Whether you're crafting debugging tools, exploring memory manipulation, or building advanced applications, NGMemory provides the tools you need to read, analyze, and modify memory in real-time effortlessly.
+NGMemory is a powerful, easy-to-use C# library designed to simplify working with external process memory and GUI interactions. Whether you're building debugging tools, exploring memory manipulation, or automating external applications, NGMemory has you covered.
 
-## Features
-- **Memory Scanning**: Locate patterns in memory with byte-level precision.
-- **Module Address Retrieval**: Easily find the base address of a specific module in a target process.
-- **Debugging Utilities**: Manage hardware breakpoints, retrieve CPU register values, and control debugging sessions.
-- **Memory Reading/Writing**: Perform efficient and safe read/write operations on external process memory.
-- **GUI Interactions**: Work with GUI components like checkboxes and text boxes within external applications.
+## Core Features
 
-## New Features
-- **Check Box Handling**: Check the state of checkboxes in external applications.
-- **Text Manipulation in GUI**: Set and get text in GUI controls like dialogs and text boxes.
-- **List View Manipulation**: Retrieve and manipulate list items in external applications.
+- **Memory Scanning**: Locate byte patterns in target processes.
+- **Module Base Address Lookup**: Quickly grab the base address of specific modules.
+- **Debugging**: Attach to processes, set hardware breakpoints, and read CPU registers.
+- **Memory Reading & Writing**: Read or modify external process memory safely.
+- **GUI Interactions**: Automate and interact with controls like checkboxes, text boxes, combo boxes, list views, and more.
 
-## Installation
-You can install NGMemory via NuGet:
-```bash
-dotnet add package NGMemory
-```
+## Easy Helper Classes
 
-## Usage
+To streamline GUI automation, NGMemory now includes several helper classes under the `NGMemory.Easy` namespace. These classes make it simple to interact with common controls in external applications:
 
-### Memory Scanning
+### `EasyCheckBox`
+- **IsChecked(IntPtr window, int controlId)**  
+  Returns `true` if the checkbox is checked, otherwise `false`.
+
+- **SetChecked(IntPtr window, int controlId, bool state)**  
+  Sets the checkbox to either checked (`true`) or unchecked (`false`).
+
+- **ToggleState(IntPtr window, int controlId)**  
+  Flips the current checkbox state.
+
+- **ClickCheckBox(IntPtr window, int controlId)**  
+  Simulates a click on the checkbox control.
+
+### `EasyTextBox`
+- **GetText(IntPtr window, int controlId)**  
+  Returns the current text in the specified text box.
+
+- **SetText(IntPtr window, int controlId, string text)**  
+  Updates the text in the specified text box.
+
+- **ClearText(IntPtr window, int controlId)**  
+  Clears the content of the specified text box.
+
+### `EasyComboBox`
+- **GetSelectedItem(IntPtr comboBoxHandle)**  
+  Returns the currently selected item's text.
+
+- **GetItems(IntPtr comboBoxHandle)**  
+  Returns all items as a string array.
+
+- **SelectItemByString(IntPtr comboBoxHandle, string itemText)**  
+  Selects the combo box entry that matches `itemText`.
+
+- **SelectItemByIndex(IntPtr comboBoxHandle, int index)**  
+  Selects the combo box entry at the specified index.
+
+### `EasySysListView32`
+- **GetItems(IntPtr listViewHandle, int columnCount)**  
+  Reads all items (rows) from the list view, returning a list of `ListViewItem` objects.
+
+- **GetItems(IntPtr listViewHandle, bool autoColumnCount)**  
+  Same as above, but automatically detects column count if `autoColumnCount` is true.
+
+- **ReadItemText(IntPtr listViewHandle, int itemIndex, int subIndex)**  
+  Reads the text from a specific row and column.
+
+- **GetColumnCount(IntPtr listViewHandle)**  
+  Retrieves the number of columns via the list view's header.
+
+- **GetAllRowsAsStrings(...)**  
+  Returns all rows as simple arrays of strings.
+
+- **InsertItem(IntPtr listViewHandle, int index, string text)**  
+  Inserts a new item (row) at the specified index with the given text in column 0.
+
+- **RemoveItem(IntPtr listViewHandle, int index)**  
+  Removes an item (row) at the specified index.
+
+- **ClearAllItems(IntPtr listViewHandle)**  
+  Removes all items from the list view.
+
+- **SetItemText(IntPtr listViewHandle, int itemIndex, string newText)**  
+  Updates the text of an item at the specified index (column 0).
+
+### `EasyGuiInterop`
+- Provides shortcuts for:
+  - Getting/setting window text.
+  - Fetching window titles.
+  - Enumerating process windows.
+  - Retrieving child handles and controlling their order.
+  - Bringing windows into the foreground, etc.
+
+### `EasyWindow`
+- **GetMainWindow(processName, partialTitle)**  
+  Returns the main window handle of a process (optionally checking if the window's title contains a specific substring).
+
+- **GetAllChildWindows(parentHandle)**  
+  Retrieves all child window handles for a given parent handle.
+
+- **GetChildByTitle(parentHandle, partialTitle)**  
+  Finds a child window by matching part of its title.
+
+- **FocusWindow(windowHandle)**  
+  Restores and brings the specified window to the foreground.
+
+- **FindAndFocus(processName, partialTitle)**  
+  Combines retrieval and focus in one step.
+
+### `EasyFormHelper`
+- **SetTextFields(...) / GetTextFields(...)**  
+  Batch set or read multiple text boxes using a dictionary of `{controlId -> text}`.
+
+- **SetCheckBoxes(...) / GetCheckBoxes(...)**  
+  Batch set or read multiple checkboxes using a dictionary of `{controlId -> bool}`.
+
+- **SetComboBoxes(...) / GetComboBoxes(...)**  
+  Batch set or read multiple combo boxes using a dictionary of `{controlId -> string}`.
+
+This makes common tasks (like populating a form with data or reading form fields at once) straightforward and saves you from writing many repetitive calls.
+
+## Usage Examples
+
+### 1. Setting Checkboxes
 ```csharp
-using NGMemory;
-using System.Diagnostics;
+// Example: Enable two checkboxes at once
+NGMemory.Easy.EasyFormHelper.SetCheckBoxes(windowHandle, new Dictionary<int, bool>
+{
+    { 0x1001, true },
+    { 0x1002, false }
+});```
 
-Process targetProcess = Process.GetProcessesByName("SonsOfTheForest").FirstOrDefault();
-Scanner scanner = new Scanner(targetProcess);
-
-IntPtr? result = scanner.ScanMemory("F3 0F 10 70 ?? 33 D2 48 8B CF ??");
-IntPtr? result2 = scanner.ScanMemory("F3 0F 10 70 10 33 D2 48 8B CF", (long)baseAddress, 0x100000000000);
-
-MessageBox.Show(result.HasValue ? $"Pattern found at: {result.Value.ToString("X")}" : "Pattern not found.");
-MessageBox.Show(result2.HasValue ? $"Pattern found at: {result2.Value.ToString("X")}" : "Pattern not found.");
-```
-
-#### Result:
-```console
-Pattern found at: 7FFB7F1ED715
-Pattern found at: 7FFB7F1ED715
-```
-With (long)baseAddress, 0x100000000000, you can search within a range from (baseAddress - 0x100000000000) to (baseAddress + 0x100000000000).
-
-### Retrieve Module Base Address
+### 2. Reading and Updating a TextBox
 ```csharp
-using NGMemory;
+// Read the current text
+string currentText = NGMemory.Easy.EasyTextBox.GetText(windowHandle, 0x4C);
 
-Module module = new Module();
-IntPtr baseAddress = module.getModuleBaseAddress("GameAssembly.dll", "SonsOfTheForest");
-MessageBox.Show($"Base Address: {baseAddress.ToString("X")}");
+// Update the text
+NGMemory.Easy.EasyTextBox.SetText(windowHandle, 0x4C, "Updated Text");
 ```
 
-#### Result:
-```console
-Base Address: 7FFB7BA60000
-```
-
-### Debugging Example
+### 3. ComboBox Selections
 ```csharp
-using NGMemory;
+// Read selected item
+string selectedItem = NGMemory.Easy.EasyComboBox.GetSelectedItem(comboHandle);
 
-ulong registerValue = DebugHook.WaitForRegister("SonsOfTheForest", new IntPtr(0x7FFB7F1ED715), Register.Rax);
-MessageBox.Show($"Register RAX Value: {registerValue:X}");
+// Select an item by string
+NGMemory.Easy.EasyComboBox.SelectItemByString(comboHandle, "Option B");
 ```
 
-#### Result:
-```console
-Register RAX Value: 0x1C741FA3310
-```
-
-### GET CheckBox Example
+### 4. ListView Automation
 ```csharp
-using NGMemory.WinInteropTools;
+int columnCount = NGMemory.Easy.EasySysListView32.GetColumnCount(listViewHandle);
+var items = NGMemory.Easy.EasySysListView32.GetItems(listViewHandle, columnCount);
 
-bool isChecked = CheckBox.IsCheckBoxChecked(pointer, controlId);
-MessageBox.Show(isChecked ? "Checked" : "Unchecked");
-```
-
-### GET TextBox Example
-```csharp
-using NGMemory.WinInteropTools;
-
-string textBoxValue = TextBox.getTextBoxValue(pointer, controlId);
-MessageBox.Show($"TextBox Value: {textBoxValue}");
-```
-
-### SET TextBox Example
-```csharp
-using NGMemory.WinInteropTools;
-
-GuiInteropHandler.InteropSetText(pointer, 0x4C, "Test");
-```
-
-### GET List View Example
-```csharp
-using NGMemory.WinInteropTools;
-
-List<ListViewItem> items = SysListView32.GetListViewItems(pointer, columnCount);
 foreach (var item in items)
 {
     Console.WriteLine(item.Text);
 }
+
+// Inserting new item
+NGMemory.Easy.EasySysListView32.InsertItem(listViewHandle, 0, "NewItem");
+
 ```
 
-### GET List View Example .NET Forms
+### 5. Window Handling
 ```csharp
-var p = Process.GetProcessesByName("twe");
-List<IntPtr> ChildList = getChildList(getWindowByContainsName(p, "Window Titel"));
+// Finds a window of process "twe" whose title contains "Einlagerungserfassung"
+IntPtr handle = NGMemory.Easy.EasyWindow.FindAndFocus("twe", "Einlagerungserfassung");
 
-IntPtr[] childLists = ChildList.ToArray();
-IntPtr windowPointer = getWindowByContainsName(p, "Window Titel");
-
-IntPtr hwndListView = NGMemory.Kernel32.GetDlgItem(childLists[0], 0x52C);
-List<ListViewItem> items = GetListViewItems(hwndListView, 14);
-foreach (var item in items)
+// Brings it to the foreground if found
+if (handle != IntPtr.Zero)
 {
-    listview.Items.Add(item);
+    // ...
 }
+
 ```
 
-## NuGet Download
-[https://www.nuget.org/packages/NGMemory/1.0.3](https://www.nuget.org/packages/NGMemory/1.0.3)
+### Example: Writing Data in One Go
+```csharp
+// Suppose you have 5 text boxes, 3 checkboxes, and 2 combo boxes to set all at once:
+NGMemory.Easy.EasyFormHelper.SetTextFields(windowHandle, new Dictionary<int, string>
+{
+    { 0x101, "First Value" },
+    { 0x102, "Second Value" },
+    { 0x103, "Third Value" },
+    { 0x104, "Fourth Value" },
+    { 0x105, "Fifth Value" }
+});
+
+NGMemory.Easy.EasyFormHelper.SetCheckBoxes(windowHandle, new Dictionary<int, bool>
+{
+    { 0x201, true },
+    { 0x202, false },
+    { 0x203, true }
+});
+
+NGMemory.Easy.EasyFormHelper.SetComboBoxes(windowHandle, new Dictionary<int, string>
+{
+    { 0x301, "Some Combo Option" },
+    { 0x302, "Another Combo Option" }
+});
+```
+
+With these helpers, repetitive interop calls (like SendMessage) are hidden behind user-friendly methods, allowing you to focus on the logic of your automation or debugging tasks.
 
 ## Contributing
 Feel free to fork this repository and contribute by submitting pull requests. Issues and feature requests are welcome!
