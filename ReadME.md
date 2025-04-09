@@ -1,4 +1,4 @@
-# NGMemory
+# NGMemory v1.0.4
 
 NGMemory is a powerful, easy-to-use C# library designed to simplify working with external process memory and GUI interactions. Whether you're building debugging tools, exploring memory manipulation, or automating external applications, NGMemory has you covered.
 
