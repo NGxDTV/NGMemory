@@ -133,7 +133,7 @@ namespace NGMemory.WinInteropTools
             throw new ArgumentOutOfRangeException(nameof(index), "Index is out of range.");
         }
 
-        public static List<IntPtr> getChildList(IntPtr from)
+        public static List<IntPtr> getChildList_old(IntPtr from)
         {
             IntPtr result = IntPtr.Zero;
             List<IntPtr> eS = new List<IntPtr>();
@@ -165,6 +165,18 @@ namespace NGMemory.WinInteropTools
             //eS.Sort((x, y) => x.ToInt64().CompareTo(y.ToInt64()));
 
             return eS;
+        }
+
+        public static List<IntPtr> getChildList(IntPtr from)
+        {
+            List<IntPtr> list = new List<IntPtr>();
+            IntPtr child = IntPtr.Zero;
+            while ((child = FindWindowEx(from, child, null, null)) != IntPtr.Zero)
+            {
+                if (GetParent(child) == from)
+                    list.Add(child);
+            }
+            return list;
         }
 
         public static IntPtr getWindowByContainsName(Process[] p, string windowName)
