@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace NGMemory.Easy
@@ -10,6 +13,9 @@ namespace NGMemory.Easy
     /// </summary>
     public static class EasySysListView32
     {
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool PostMessage(IntPtr hWnd, uint Msg, int wParam, int lParam);
+
         // Native Konstante
         private const int LVM_DELETEALLITEMS = 0x1009;
         private const int LVM_DELETEITEM = 0x1008;
@@ -123,6 +129,46 @@ namespace NGMemory.Easy
             NGMemory.User32.SendMessage(listViewHandle, LVM_DELETEALLITEMS, IntPtr.Zero, IntPtr.Zero);
         }
 
+        public static IntPtr SearchSysListView32InWindow(IntPtr listViewWindowHandle)
+        {
+            IntPtr child = IntPtr.Zero;
+
+            for (int i = 0; i < 50; i++)
+            {
+                child = NGMemory.User32.FindWindowEx(listViewWindowHandle, child, null, null);
+                if (child == IntPtr.Zero) break;
+
+                StringBuilder sb = new StringBuilder(256);
+                NGMemory.User32.GetClassName(child, sb, sb.Capacity);
+
+                if (sb.ToString() == "SysListView32")
+                {
+                    return child;
+                    break;
+                }
+            }
+
+            return child;
+        }
+
+        public static int GetListViewItemByName(IntPtr listViewHandle, string ContainsName)
+        {
+            List<string[]> data = NGMemory.Easy.EasySysListView32.GetAllRowsAsStrings(listViewHandle, true);
+
+            int index = 0;
+
+            for (int i = 0; i < data.Count(); i++)
+            {
+                if (data[i][0].Contains(ContainsName))
+                {
+                    index = i;
+                    break;
+                }
+            }
+
+            return index;
+        }
+
         /// <summary>
         /// Setzt den Text eines bestimmten Items in Spalte 0 (bzw. SubItem=0).
         /// </summary>
@@ -139,6 +185,22 @@ namespace NGMemory.Easy
             NGMemory.User32.SendMessage(listViewHandle, LVM_SETITEM, IntPtr.Zero, pLvItem);
             Marshal.FreeHGlobal(lvItem.pszText);
             Marshal.FreeHGlobal(pLvItem);
+        }
+
+        public static void SelectItemByIndex(IntPtr listViewHandle, int index)
+        {
+            for (int i = 0; i < index; i++)
+            {
+                PostMessage(listViewHandle, 0x0100, 0x28, 0);
+                Thread.Sleep(100);
+            }
+            PostMessage(listViewHandle, 0x0100, 0x0D, 0);
+        }
+
+        public static void SelectItemByName(IntPtr listViewHandle, string ContainsName)
+        {
+            int index = GetListViewItemByName(listViewHandle, ContainsName);
+            SelectItemByIndex(listViewHandle, index);
         }
 
         // Einfacher LV_ITEM für unsere Zwecke (nur Unicode-Text).

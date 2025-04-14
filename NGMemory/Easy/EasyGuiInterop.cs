@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 
 namespace NGMemory.Easy
 {
@@ -103,6 +104,13 @@ namespace NGMemory.Easy
         public static IntPtr GetWindowByContainsName(Process[] processList, string windowName)
         {
             return WinInteropTools.GuiInteropHandler.getWindowByContainsName(processList, windowName);
+        }
+
+        public static string GetClassName(IntPtr hWnd)
+        {
+            StringBuilder className = new StringBuilder(256);
+            NGMemory.User32.GetClassName(hWnd, className, className.Capacity);
+            return className.ToString();
         }
     }
 }

@@ -68,6 +68,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Easy\EasyButton.cs" />
     <Compile Include="Easy\EasyCheckBox.cs" />
     <Compile Include="Easy\EasyComboBox.cs" />
     <Compile Include="Easy\EasyDebugHook.cs" />
