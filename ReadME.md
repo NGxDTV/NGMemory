@@ -9,8 +9,8 @@ NGMemory is a powerful, easy‑to‑use C# library that simplifies external **pr
 | Area                | Added                                                                                                                |
 | ------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | **Menu automation** | `WinInteropTools.MenuStripHelper.ClickMenu(...)` – trigger any *nested* MenuStrip item; no SendKeys/RDP hassle.      |
-| **Input combos**    | `WinInteropTools.InputHelper.PressKeys(...)` – press **any** key combination via `params ScanCode[]`, sync or async. |
-| **Key enum**        | `WinInteropTools.ScanCode` – readable names for all common scan‑codes (e.g. `ScanCode.LCtrl`, `ScanCode.C`).         |
+| **Input combos**    | `WinInteropTools.InputHelper.PressKeys(...)` – press **any** key combination via `params KeyCode[]`, sync or async. |
+| **Key enum**        | `WinInteropTools.KeyCode` – readable names for all common scan‑codes (e.g. `KeyCode.LCtrl`, `KeyCode.C`).         |
 
 > **Why PressKeys?**  It is a drop‑in, RDP‑friendly replacement for `SendKeys`, perfect for **unattended** automation where classic `SendKeys` fails.
 
@@ -21,13 +21,13 @@ NGMemory is a powerful, easy‑to‑use C# library that simplifies external **pr
 MenuStripHelper.ClickMenu(targetWnd, true, 5, 7, 4);
 
 // Ctrl + C (blocking)
-InputHelper.PressKeys(false, ScanCode.LCtrl, ScanCode.C);
+InputHelper.PressKeys(false, KeyCode.LCtrl, KeyCode.C);
 
 // Alt + U (async)
-InputHelper.PressKeys(true, ScanCode.LAlt, ScanCode.U);
+InputHelper.PressKeys(true, KeyCode.LAlt, KeyCode.U);
 
 // Only U (blocking)
-InputHelper.PressKeys(false, ScanCode.U);
+InputHelper.PressKeys(false, KeyCode.U);
 ```
 
 ---
