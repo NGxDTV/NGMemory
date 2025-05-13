@@ -75,6 +75,7 @@
     <Compile Include="Easy\EasyEnums.cs" />
     <Compile Include="Easy\EasyFormHelper.cs" />
     <Compile Include="Easy\EasyGuiInterop.cs" />
+    <Compile Include="Easy\EasyPressKey.cs" />
     <Compile Include="Easy\EasySysListView32.cs" />
     <Compile Include="Easy\EasyTextBox.cs" />
     <Compile Include="Easy\EasyWindow.cs" />
@@ -97,6 +98,8 @@
     <Compile Include="WinInteropTools\CheckBox.cs" />
     <Compile Include="WinInteropTools\ComboBox.cs" />
     <Compile Include="WinInteropTools\GuiInteropHandler.cs" />
+    <Compile Include="WinInteropTools\InputHelper.cs" />
+    <Compile Include="WinInteropTools\MenuStripHelper.cs" />
     <Compile Include="WinInteropTools\SysListView32.cs" />
     <Compile Include="WinInteropTools\TextBox.cs" />
   </ItemGroup>
