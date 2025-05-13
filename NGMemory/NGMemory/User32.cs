@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using static NGMemory.Constants;
 using static NGMemory.Kernel32;
 
 namespace NGMemory
@@ -46,6 +47,9 @@ namespace NGMemory
         [DllImport("user32.dll")]
         public static extern bool PostMessage(IntPtr hWnd, uint Msg, int wParam, int lParam);
 
+        [DllImport("user32.dll")] 
+        public static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wP, IntPtr lP);
+
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
@@ -70,5 +74,17 @@ namespace NGMemory
 
         [DllImport("user32.dll", SetLastError = true)]
         public static extern int GetDlgCtrlID(IntPtr hwndCtl);
+
+        [DllImport("user32.dll")] 
+        public static extern IntPtr GetMenu(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetSubMenu(IntPtr hMenu, int nPos);
+
+        [DllImport("user32.dll")]
+        public static extern uint GetMenuItemID(IntPtr hMenu, int nPos);
+
+        [DllImport("user32.dll")] 
+        public static extern uint SendInput(uint n, INPUT[] p, int cb);
     }
 }

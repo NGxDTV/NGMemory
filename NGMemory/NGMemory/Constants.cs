@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -182,5 +183,15 @@ namespace NGMemory
 
         public const int BST_CHECKED = 1;
         public const int BST_UNCHECKED = 0;
+
+        public const int INPUT_KEYBOARD = 1;
+        public const uint KEYEVENTF_SCANCODE = 0x0008;
+        public const uint KEYEVENTF_KEYUP = 0x0002;
+        public const uint WM_COPY = 0x0301;
+
+        public struct INPUT { public int type; public INPUTUNION u; }
+        [StructLayout(LayoutKind.Explicit)]
+        public struct INPUTUNION { [FieldOffset(0)] public KEYBDINPUT ki; }
+        public struct KEYBDINPUT { public ushort wVk, wScan; public uint dwFlags, time; public IntPtr info; }
     }
 }
