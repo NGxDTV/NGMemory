@@ -1,6 +1,6 @@
 # NGMemory v1.0.5
 
-NGMemory is a powerful, easy-to-use C# library that simplifies external **process-memory work** *and* rich **GUI automation**. Whether you are debugging, manipulating memory, or scripting complex UIs, NGMemory has you covered.
+NGMemory is a powerful, easy‑to‑use C# library that simplifies external **process‑memory work** *and* rich **GUI automation**. Whether you are debugging, manipulating memory, or scripting complex UIs, NGMemory has you covered.
 
 ---
 
@@ -10,20 +10,20 @@ NGMemory is a powerful, easy-to-use C# library that simplifies external **proces
 | ------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | **Menu automation** | `WinInteropTools.MenuStripHelper.ClickMenu(...)` – trigger any *nested* MenuStrip item; no SendKeys/RDP hassle.      |
 | **Input combos**    | `WinInteropTools.InputHelper.PressKeys(...)` – press **any** key combination via `params ScanCode[]`, sync or async. |
-| **Key enum**        | `WinInteropTools.ScanCode` – readable names for all common scan-codes (e.g. `ScanCode.LCtrl`, `ScanCode.C`).         |
+| **Key enum**        | `WinInteropTools.ScanCode` – readable names for all common scan‑codes (e.g. `ScanCode.LCtrl`, `ScanCode.C`).         |
 
-> **Why PressKeys?**  It is a drop-in, RDP-friendly replacement for `SendKeys`, perfect for **unattended** automation where classic `SendKeys` fails.
+> **Why PressKeys?**  It is a drop‑in, RDP‑friendly replacement for `SendKeys`, perfect for **unattended** automation where classic `SendKeys` fails.
 
 ### Quick 1.0.5 Examples
 
 ```csharp
-// Click menu path 5 ➜ 7 ➜ 4 (non-blocking)
+// Click menu path 5 ➜ 7 ➜ 4 (non‑blocking)
 MenuStripHelper.ClickMenu(targetWnd, true, 5, 7, 4);
 
-// Ctrl + C (blocking)
+// Ctrl + C (blocking)
 InputHelper.PressKeys(false, ScanCode.LCtrl, ScanCode.C);
 
-// Alt + U (async)
+// Alt + U (async)
 InputHelper.PressKeys(true, ScanCode.LAlt, ScanCode.U);
 
 // Only U (blocking)
@@ -64,7 +64,7 @@ NGMemory provides helpers under `NGMemory.Easy` to make UI automation painless.
 
 ### `EasyGuiInterop`
 
-* Window text, titles, enumeration, z-order, focus…
+* Window text, titles, enumeration, z‑order, focus…
 
 ### `EasyWindow`
 
@@ -73,6 +73,10 @@ NGMemory provides helpers under `NGMemory.Easy` to make UI automation painless.
 ### `EasyFormHelper`
 
 * Batch set / read **TextBoxes**, **CheckBoxes**, **ComboBoxes** with dictionaries.
+
+### `EasyPressKey`
+
+* Convenience wrapper: `EasyPressKey.PressKeys(async, params KeyCode[])` → forwards to `InputHelper.PressKeys` for quick key combos from the `NGMemory.Easy` namespace.
 
 ---
 
