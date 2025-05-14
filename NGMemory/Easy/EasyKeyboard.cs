@@ -19,21 +19,28 @@ namespace NGMemory.Easy
 
             foreach (char c in text)
             {
-                KeyCode keyCode = CharToKeyCode(c);
-                if (keyCode != 0)
+                if (Enums.SpecialKeys.TryGetValue(c, out var sk))
                 {
-                    // Groﬂbuchstaben mit Shift
-                    if (char.IsUpper(c))
-                    {
-                        EasyPressKey.PressKeys(false, KeyCode.LShift, keyCode);
-                        Thread.Sleep(delayBetweenChars);
-                    }
+                    if (sk.shift)
+                        EasyPressKey.PressKeys(false, KeyCode.LShift, sk.code);
                     else
-                    {
-                        EasyPressKey.PressKeys(false, keyCode);
-                        Thread.Sleep(delayBetweenChars);
-                    }
+                        EasyPressKey.PressKeys(false, sk.code);
                 }
+                else if (char.IsLetter(c))
+                {
+                    var code = (KeyCode)Enum.Parse(typeof(KeyCode), char.ToUpper(c).ToString());
+                    if (char.IsUpper(c))
+                        EasyPressKey.PressKeys(false, KeyCode.LShift, code);
+                    else
+                        EasyPressKey.PressKeys(false, code);
+                }
+                else if (char.IsDigit(c))
+                {
+                    var code = (KeyCode)Enum.Parse(typeof(KeyCode), "D" + c);
+                    EasyPressKey.PressKeys(false, code);
+                }
+
+                Thread.Sleep(delayBetweenChars);
             }
         }
 
@@ -64,20 +71,16 @@ namespace NGMemory.Easy
         /// <summary>
         /// Konvertiert ein Zeichen in den entsprechenden Scancode.
         /// </summary>
-        private static KeyCode CharToKeyCode(char c)
+        public static KeyCode CharToKeyCode(char c)
         {
-            // ASCII-Buchstaben
-            if (c >= 'a' && c <= 'z')
-                return (KeyCode)((int)KeyCode.A + (c - 'a'));
-            
-            if (c >= 'A' && c <= 'Z')
-                return (KeyCode)((int)KeyCode.A + (c - 'A'));
-            
-            // Zahlen
-            if (c >= '0' && c <= '9')
-                return (KeyCode)((int)KeyCode.D0 + (c - '0'));
-            
-            // Sonderzeichen
+            if (char.IsLetter(c))
+                if (Enum.TryParse(c.ToString().ToUpper(), out KeyCode letterCode))
+                    return letterCode;
+
+            if (char.IsDigit(c))
+                if (Enum.TryParse("D" + c, out KeyCode digitCode))
+                    return digitCode;
+
             switch (c)
             {
                 case ' ': return KeyCode.Space;
@@ -85,7 +88,7 @@ namespace NGMemory.Easy
                 case ',': return KeyCode.Comma;
                 case '\n': return KeyCode.Enter;
                 case '\t': return KeyCode.Tab;
-                default: return 0;
+                default: return KeyCode.None;
             }
         }
     }
