@@ -8,22 +8,21 @@
 2. [Installation](#installation)
 3. [NGMemory Easy API](#ngmemory-easy-api)
 
-   1. [EasyConfig](#easyconfig)
-   2. [EasyButton](#easybutton)
-   3. [EasyCheckBox](#easycheckbox)
-   4. [EasyComboBox](#easycombobox)
-   5. [EasyTextBox](#easytextbox)
-   6. [EasyFormHelper](#easyformhelper)
-   7. [EasyGuiInterop](#easyguiinterop)
-   8. [EasyKeyboard & EasyPressKey](#easykeyboard--easypresskey)
-   9. [EasyMouse](#easymouse)
-   10. [EasyElementFinder](#easyelementfinder)
-   11. [EasyDebugHook](#easydebughook)
-   12. [EasyMemory](#easymemory)
-   13. [EasyScreen & EasyScreenAnalysis](#easyscreen--easyscreenanalysis)
-   14. [EasySysListView32](#easysyslistview32)
-   15. [EasyWait](#easywait)
-   16. [EasyWindow](#easywindow)
+   1. [EasyButton](#easybutton)
+   2. [EasyCheckBox](#easycheckbox)
+   3. [EasyComboBox](#easycombobox)
+   4. [EasyTextBox](#easytextbox)
+   5. [EasyFormHelper](#easyformhelper)
+   6. [EasyGuiInterop](#easyguiinterop)
+   7. [EasyKeyboard & EasyPressKey](#easykeyboard--easypresskey)
+   8. [EasyMouse](#easymouse)
+   9. [EasyElementFinder](#easyelementfinder)
+   10. [EasyDebugHook](#easydebughook)
+   11. [EasyMemory](#easymemory)
+   12. [EasyScreen & EasyScreenAnalysis](#easyscreen--easyscreenanalysis)
+   13. [EasySysListView32](#easysyslistview32)
+   14. [EasyWait](#easywait)
+   15. [EasyWindow](#easywindow)
 4. [WinInteropTools](#wininteroptools)
 
    1. [GuiInteropHandler](#guiinterophandler)
@@ -67,22 +66,6 @@ using NGMemory.WinInteropTools;
 ```
 
 ## NGMemory Easy API
-
-### EasyConfig
-
-Global settings for delays and logging:
-
-* `DefaultKeyDelay` (ms) – delay between keystrokes.
-* `DefaultMouseDelay` (ms) – delay between mouse moves.
-* `EnableVerboseLogging` – detailed logs.
-* `EnableAutoRetry`, `MaxRetryCount` – retry on failure.
-
-**Example:**
-
-```csharp
-EasyConfig.DefaultKeyDelay = 20;
-EasyConfig.EnableVerboseLogging = true;
-```
 
 ### EasyButton
 
