@@ -1,6 +1,4 @@
-# NGMemory 1.0.6 (Interim Release)
-
-> **Note:** Version 1.0.6 is an interim release with major updates and not yet fully tested. Use with caution.
+# NGMemory 1.0.6
 
 ## Table of Contents
 
