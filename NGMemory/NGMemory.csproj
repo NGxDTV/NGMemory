@@ -59,6 +59,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -71,13 +72,21 @@
     <Compile Include="Easy\EasyButton.cs" />
     <Compile Include="Easy\EasyCheckBox.cs" />
     <Compile Include="Easy\EasyComboBox.cs" />
+    <Compile Include="Easy\EasyConfig.cs" />
     <Compile Include="Easy\EasyDebugHook.cs" />
+    <Compile Include="Easy\EasyElementFinder.cs" />
     <Compile Include="Easy\EasyEnums.cs" />
     <Compile Include="Easy\EasyFormHelper.cs" />
     <Compile Include="Easy\EasyGuiInterop.cs" />
+    <Compile Include="Easy\EasyKeyboard.cs" />
+    <Compile Include="Easy\EasyMemory.cs" />
+    <Compile Include="Easy\EasyMouse.cs" />
     <Compile Include="Easy\EasyPressKey.cs" />
+    <Compile Include="Easy\EasyScreen.cs" />
+    <Compile Include="Easy\EasyScreenAnalysis.cs" />
     <Compile Include="Easy\EasySysListView32.cs" />
     <Compile Include="Easy\EasyTextBox.cs" />
+    <Compile Include="Easy\EasyWait.cs" />
     <Compile Include="Easy\EasyWindow.cs" />
     <Compile Include="NGMemory\Constants.cs" />
     <Compile Include="NGMemory\DebugHook.cs" />

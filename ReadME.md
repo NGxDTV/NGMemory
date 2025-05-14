@@ -1,160 +1,387 @@
-# NGMemory v1.0.5
+# NGMemory 1.0.6 (Interim Release)
 
-NGMemory is a powerful, easy‑to‑use C# library that simplifies external **process‑memory work** *and* rich **GUI automation**. Whether you are debugging, manipulating memory, or scripting complex UIs, NGMemory has you covered.
+> **Note:** Version 1.0.6 is an interim release with major updates and not yet fully tested. Use with caution.
 
----
+## Table of Contents
 
-## 🚀 What’s new in 1.0.5
+1. [Overview](#overview)
+2. [Installation](#installation)
+3. [NGMemory Easy API](#ngmemory-easy-api)
 
-| Area                | Added                                                                                                                |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| **Menu automation** | `WinInteropTools.MenuStripHelper.ClickMenu(...)` – trigger any *nested* MenuStrip item; no SendKeys/RDP hassle.      |
-| **Input combos**    | `WinInteropTools.InputHelper.PressKeys(...)` – press **any** key combination via `params KeyCode[]`, sync or async. |
-| **Key enum**        | `WinInteropTools.KeyCode` – readable names for all common scan‑codes (e.g. `KeyCode.LCtrl`, `KeyCode.C`).         |
+   1. [EasyConfig](#easyconfig)
+   2. [EasyButton](#easybutton)
+   3. [EasyCheckBox](#easycheckbox)
+   4. [EasyComboBox](#easycombobox)
+   5. [EasyTextBox](#easytextbox)
+   6. [EasyFormHelper](#easyformhelper)
+   7. [EasyGuiInterop](#easyguiinterop)
+   8. [EasyKeyboard & EasyPressKey](#easykeyboard--easypresskey)
+   9. [EasyMouse](#easymouse)
+   10. [EasyElementFinder](#easyelementfinder)
+   11. [EasyDebugHook](#easydebughook)
+   12. [EasyMemory](#easymemory)
+   13. [EasyScreen & EasyScreenAnalysis](#easyscreen--easyscreenanalysis)
+   14. [EasySysListView32](#easysyslistview32)
+   15. [EasyWait](#easywait)
+   16. [EasyWindow](#easywindow)
+4. [WinInteropTools](#wininteroptools)
 
-> **Why PressKeys?**  It is a drop‑in, RDP‑friendly replacement for `SendKeys`, perfect for **unattended** automation where classic `SendKeys` fails.
+   1. [GuiInteropHandler](#guiinterophandler)
+   2. [CheckBox & ComboBox](#checkbox--combobox)
+   3. [InputHelper](#inputhelper)
+   4. [MenuStripHelper](#menustriphelper)
+   5. [SysListView32](#syslistview32)
+   6. [TextBox](#textbox)
+5. [Core Library (NGMemory)](#core-library-ngmemory)
 
-### Quick 1.0.5 Examples
-
-```csharp
-// Click menu path 5 ➜ 7 ➜ 4 (non‑blocking)
-MenuStripHelper.ClickMenu(targetWnd, true, 5, 7, 4);
-
-// Ctrl + C (blocking)
-InputHelper.PressKeys(false, KeyCode.LCtrl, KeyCode.C);
-
-// Alt + U (async)
-InputHelper.PressKeys(true, KeyCode.LAlt, KeyCode.U);
-
-// Only U (blocking)
-InputHelper.PressKeys(false, KeyCode.U);
-```
-
----
-
-## Core Features (v1.0.x)
-
-* **Memory Scanning** – locate byte patterns in target processes.
-* **Module Base Address Lookup** – grab module bases fast.
-* **Debugging** – attach, set HW breakpoints, read CPU registers.
-* **Memory Reading & Writing** – safe external memory access.
-* **GUI Interactions** – automate checkboxes, text boxes, combo boxes, list views, etc.
-
----
-
-## Easy Helper Classes
-
-NGMemory provides helpers under `NGMemory.Easy` to make UI automation painless.
-
-### `EasyCheckBox`
-
-* `IsChecked`, `SetChecked`, `ToggleState`, `ClickCheckBox`
-
-### `EasyTextBox`
-
-* `GetText`, `SetText`, `ClearText`
-
-### `EasyComboBox`
-
-* `GetSelectedItem`, `GetItems`, `SelectItemByString`, `SelectItemByIndex`
-
-### `EasySysListView32`
-
-* `GetItems`, `ReadItemText`, `GetColumnCount`, `InsertItem`, `RemoveItem`, `ClearAllItems`, `SetItemText`, etc.
-
-### `EasyGuiInterop`
-
-* Window text, titles, enumeration, z‑order, focus…
-
-### `EasyWindow`
-
-* `GetMainWindow`, `GetAllChildWindows`, `FindAndFocus`, `FocusWindow`
-
-### `EasyFormHelper`
-
-* Batch set / read **TextBoxes**, **CheckBoxes**, **ComboBoxes** with dictionaries.
-
-### `EasyPressKey`
-
-* Convenience wrapper: `EasyPressKey.PressKeys(async, params KeyCode[])` → forwards to `InputHelper.PressKeys` for quick key combos from the `NGMemory.Easy` namespace.
+   1. [Constants, Enums, Structures](#constants-enums-structures)
+   2. [User32, Kernel32 & MessageHelper](#user32-kernel32--messagehelper)
+   3. [DebugHook](#debughook)
+   4. [Scanner](#scanner)
+   5. [Module](#module)
+   6. [VAMemory](#vamemory)
+6. [Examples](#examples)
+7. [License](#license)
 
 ---
 
-## Usage Examples
+## Overview
 
-### 1. Setting Checkboxes
+NGMemory 1.0.6 provides:
 
-```csharp
-NGMemory.Easy.EasyFormHelper.SetCheckBoxes(windowHandle, new Dictionary<int, bool>
-{
-    { 0x1001, true },
-    { 0x1002, false }
-});
+* **GUI Automation**: Click buttons, set text, interact with ComboBox, CheckBox, etc.
+* **Memory Access**: Read/write process memory, pattern scanning.
+* **Debugging**: Set hardware breakpoints and read registers.
+* **Screen Analysis**: Screenshots, color search, image matching.
+
+## Installation
+
+```powershell
+Install-Package NGMemory -Version 1.0.6
 ```
 
-### 2. Reading & Updating a TextBox
-
 ```csharp
-string current = NGMemory.Easy.EasyTextBox.GetText(windowHandle, 0x4C);
-NGMemory.Easy.EasyTextBox.SetText(windowHandle, 0x4C, "Updated Text");
+using NGMemory;
+using NGMemory.Easy;
+using NGMemory.WinInteropTools;
 ```
 
-### 3. ComboBox Selections
+## NGMemory Easy API
+
+### EasyConfig
+
+Global settings for delays and logging:
+
+* `DefaultKeyDelay` (ms) – delay between keystrokes.
+* `DefaultMouseDelay` (ms) – delay between mouse moves.
+* `EnableVerboseLogging` – detailed logs.
+* `EnableAutoRetry`, `MaxRetryCount` – retry on failure.
+
+**Example:**
 
 ```csharp
-string sel = NGMemory.Easy.EasyComboBox.GetSelectedItem(comboHandle);
-NGMemory.Easy.EasyComboBox.SelectItemByString(comboHandle, "Option B");
+EasyConfig.DefaultKeyDelay = 20;
+EasyConfig.EnableVerboseLogging = true;
 ```
 
-### 4. ListView Automation
+### EasyButton
+
+Simulate button clicks by control ID.
+
+* `Click(windowHandle, controlId)`
+* `ClickAsync(windowHandle, controlId)`
+
+**Example:**
 
 ```csharp
-int cols = NGMemory.Easy.EasySysListView32.GetColumnCount(listViewHandle);
-var items = NGMemory.Easy.EasySysListView32.GetItems(listViewHandle, cols);
-
-foreach (var it in items)
-    Console.WriteLine(it.Text);
-
-NGMemory.Easy.EasySysListView32.InsertItem(listViewHandle, 0, "NewItem");
+EasyButton.Click(hwnd, 1001);
+EasyButton.ClickAsync(hwnd, 1002);
 ```
 
-### 5. Window Handling
+### EasyCheckBox
+
+CheckBox helpers:
+
+* `IsChecked(windowHandle, controlId)` → bool
+* `SetChecked(windowHandle, controlId, state)`
+* `ToggleState(windowHandle, controlId)`
+* `ClickCheckBox(windowHandle, controlId)`
+
+**Example:**
 
 ```csharp
-IntPtr h = NGMemory.Easy.EasyWindow.FindAndFocus("twe", "Einlagerungserfassung");
-if (h != IntPtr.Zero)
-{
-    // ...
+bool on = EasyCheckBox.IsChecked(hwnd, 2001);
+EasyCheckBox.ToggleState(hwnd, 2001);
+```
+
+### EasyComboBox
+
+ComboBox helpers:
+
+* `GetSelectedItem(comboHandle)` → string or null
+* `GetItems(comboHandle)` → string\[]
+* `SelectItemByString(comboHandle, text)`
+* `SelectItemByIndex(comboHandle, index)`
+
+**Example:**
+
+```csharp
+var items = EasyComboBox.GetItems(combo);
+EasyComboBox.SelectItemByString(combo, "Option A");
+```
+
+### EasyTextBox
+
+TextBox helpers:
+
+* `GetText(windowHandle, controlId)` → string
+* `SetText(windowHandle, controlId, text)`
+* `ClearText(windowHandle, controlId)`
+
+**Example:**
+
+```csharp
+string text = EasyTextBox.GetText(hwnd, 3001);
+EasyTextBox.ClearText(hwnd, 3001);
+```
+
+### EasyFormHelper
+
+Batch operations on multiple controls:
+
+* `SetTextFields(windowHandle, Dictionary<int,string>)`
+* `GetTextFields(windowHandle, params int[])` → Dictionary\<int,string>
+* `SetCheckBoxes(windowHandle, Dictionary<int,bool>)`
+* `GetCheckBoxes(windowHandle, params int[])` → Dictionary\<int,bool>
+* `SetComboBoxes(windowHandle, Dictionary<int,string>)`
+* `GetComboBoxes(windowHandle, params int[])` → Dictionary\<int,string>
+
+**Example:**
+
+```csharp
+var textMap = new Dictionary<int,string>{{3001,"A"},{3002,"B"}};
+EasyFormHelper.SetTextFields(hwnd, textMap);
+```
+
+### EasyGuiInterop
+
+Low-level window and control handles:
+
+* `GetControlHandle(windowHandle, controlId)` → IntPtr
+* `GetChildWindows(parentHandle)` → List<IntPtr>
+* `GetWindowTitle(hWnd)` → string
+* `SetText(dialogHandle, controlId, text)`
+
+### EasyKeyboard & EasyPressKey
+
+Keyboard input:
+
+* `TypeText(text, delay)` / `TypeTextAsync(text, delay)`
+* `SendCtrlC()`, `SendCtrlV()`
+* `PressKeys(async, KeyCode...)` / `PressKeysAsync(KeyCode...)`
+* \`PressKeysWithDelay(delay, KeyCode...)
+
+**Example:**
+
+```csharp
+EasyKeyboard.TypeText("Hello World", 10);
+EasyPressKey.PressKeys(false, KeyCode.LCtrl, KeyCode.C);
+```
+
+### EasyMouse
+
+Mouse operations:
+
+* `MoveTo(x,y)`
+* `MoveWithHumanMotion(x,y,duration)`
+* `Click(button)`, `ClickAt(x,y,button)`
+* `HumanClickAt(x,y,button)`
+* `DoubleClick(button)`
+* \`DragAndDrop(fromX,fromY,toX,toY)
+
+**Example:**
+
+```csharp
+EasyMouse.HumanClickAt(100,200);
+```
+
+### EasyElementFinder
+
+Search UI elements by criteria:
+
+* `FindElement(parent, className?, windowText?, controlId?)` → IntPtr
+* `GetWindowRect(hWnd)` → Rectangle
+
+**Example:**
+
+```csharp
+IntPtr btn = EasyElementFinder.FindElement(mainHwnd, className:"Button", windowText:"OK");
+```
+
+### EasyDebugHook
+
+Wait for hardware breakpoint and read register:
+
+* `WaitForRegister(processName or ID, address, Register)` → ulong
+
+**Example:**
+
+```csharp
+ulong value = EasyDebugHook.WaitForRegister("notepad", addr, Register.Rax);
+```
+
+### EasyMemory
+
+Memory pattern scanning and reading strings:
+
+* `FindPattern(processName, pattern, startAddr?, endAddr?)` → IntPtr
+* `ReadString(processName, address, maxLength, encoding?)` → string
+
+**Example:**
+
+```csharp
+IntPtr addr = EasyMemory.FindPattern("game", "90 90 ?? 90");
+string title = EasyMemory.ReadString("game", addr);
+```
+
+### EasyScreen & EasyScreenAnalysis
+
+Screen capture and analysis:
+
+* `CaptureScreen()`, `CaptureRegion(x,y,w,h)`, `CaptureWindow(hWnd)`
+* `FindColor(color, area, tolerance)` → Point?
+* `FindAllColorMatches(color, area, tolerance)` → List<Point>
+* `CompareImages(img1,img2,samplingRate)` → double%
+* `FindImageOnScreen(template, area, minSimilarity)` → Point?
+
+**Example:**
+
+```csharp
+var matches = EasyScreenAnalysis.FindAllColorMatches(Color.Red, new Rectangle(0,0,50,50));
+```
+
+### EasySysListView32
+
+ListView control helpers:
+
+* `GetItems(handle, columnCount or auto)` → List<ListViewItem>
+* `GetAllRowsAsStrings(handle, columnCount or auto)` → List\<string\[]>
+* `InsertItem(handle,index,text)`, `RemoveItem(handle,index)`, `ClearAllItems(handle)`
+* `SetItemText(handle,index,text)`, `SelectItemByName(handle,name)`
+
+**Example:**
+
+```csharp
+var rows = EasySysListView32.GetAllRowsAsStrings(lvHwnd, true);
+EasySysListView32.InsertItem(lvHwnd, 0, "New");
+```
+
+### EasyWait
+
+Waiting utilities:
+
+* `Until(condition, timeout, interval)` → bool
+* `ForDuration(ms)`
+* `RetryUntilSuccess(action, successCheck, attempts, delay)` → bool
+
+### EasyWindow
+
+Window handling:
+
+* `Find(processName, partialTitle?)` / `FindAndFocus(...)` → IntPtr
+* `GetMainWindow(processName, partialTitle?)`, `FocusWindow(hWnd)`
+* `GetAllChildWindows(parent)` → List<IntPtr>
+
+## WinInteropTools
+
+Low-level P/Invoke wrappers for GUI interop.
+
+### GuiInteropHandler
+
+* `InteropSetText(dialog, id, text)`
+* `GetWindowTitle(hWnd)`
+* `getRef(hWnd, id)` → HandleRef
+* `EnumerateProcessWindowHandles(process)` → IEnumerable<IntPtr>
+* `getChildList(parent)` → List<IntPtr>
+
+### CheckBox & ComboBox
+
+* `CheckBox.IsCheckBoxChecked`, `SetCheckBoxState`
+* `ComboBox.GetSelectedItem`, `GetItems`, `SetSelectedItem`, `SetSelectedIndex`
+
+### InputHelper
+
+Keyboard/mouse via `SendInput`:
+
+* `PressKeys`, `PressKeysWithDelay`, `CopySelection`
+* `MouseMoveTo`, `MouseClick`, `MouseDown`, `MouseUp`
+
+### MenuStripHelper
+
+Click menu items by path:
+
+* `ClickMenu(hWnd, async, indices[] )`
+
+### SysListView32
+
+Read ListView items in another process:
+
+* `GetListViewItems`, `ReadListViewItem`
+
+### TextBox
+
+Get value of TextBox control:
+
+* `getTextBoxValue(window, controlId)` → string
+
+## Core Library (NGMemory)
+
+### Constants, Enums, Structures
+
+Windows API constants, register and MessageBox enums,
+`DEBUG_EVENT`, `CONTEXT`, `MEMORY_BASIC_INFORMATION`, `SYSTEM_INFO`.
+
+### User32, Kernel32 & MessageHelper
+
+All P/Invoke signatures and `ShowMessage` helper.
+
+### DebugHook
+
+Attach to process, set hardware breakpoint, wait for single-step exception, read register.
+
+### Scanner
+
+Scan process memory regions with `VirtualQueryEx`, search byte patterns with wildcards.
+
+### Module
+
+Get base address of a module by name in a process.
+
+### VAMemory
+
+General-purpose read/write of any type:
+`ReadByteArray`, `ReadStringUnicode/ASCII`, `ReadInt32`, ..., `WriteXxx` methods.
+
+**Example:**
+
+```csharp
+var mem = new VAMemory("game");
+if(mem.CheckProcess()){
+    int health = mem.ReadInt32(addr);
+    mem.WriteInt32(addr, 999);
 }
 ```
 
-### 6. Filling a Form in One Go
+## Examples
 
 ```csharp
-NGMemory.Easy.EasyFormHelper.SetTextFields(windowHandle, new Dictionary<int, string>
-{
-    { 0x101, "First" },
-    { 0x102, "Second" },
-    { 0x103, "Third" }
-});
-
-NGMemory.Easy.EasyFormHelper.SetCheckBoxes(windowHandle, new Dictionary<int, bool>
-{
-    { 0x201, true },
-    { 0x202, false }
-});
-
-NGMemory.Easy.EasyFormHelper.SetComboBoxes(windowHandle, new Dictionary<int, string>
-{
-    { 0x301, "Choice A" },
-    { 0x302, "Choice B" }
-});
+// Automate Notepad:
+var hwnd = EasyWindow.Find("notepad");
+EasyWindow.FocusWindow(hwnd);
+EasyKeyboard.TypeText("Automation started...\n");
+EasyButton.Click(hwnd, 1);
 ```
 
----
-
-## Contributing
-Feel free to fork this repository and contribute by submitting pull requests. Issues and feature requests are welcome!
-
 ## License
-This library is licensed under the [MIT License](LICENSE).
+
+MIT

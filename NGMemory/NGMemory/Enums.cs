@@ -77,6 +77,7 @@ namespace NGMemory
 
         public enum KeyCode : ushort
         {
+            None = 0x00,
             Esc = 0x01,
             D1 = 0x02,
             D2 = 0x03,
