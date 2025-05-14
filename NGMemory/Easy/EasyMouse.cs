@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace NGMemory.Easy
 {
@@ -48,11 +49,11 @@ namespace NGMemory.Easy
             
             // Anzahl der Schritte basierend auf der Distanz
             double distance = Math.Sqrt(Math.Pow(targetX - startX, 2) + Math.Pow(targetY - startY, 2));
-            int steps = (int)(distance / 10) + 5;
-            
+            int steps = Math.Max(5, duration / 10);
+
             // Verzögerung zwischen Bewegungen
-            int delay = duration / steps;
-            
+            int delay = Math.Max(1, duration / steps);
+
             // Bézierkurve für natürliche Bewegung
             for (int i = 0; i <= steps; i++)
             {
@@ -104,11 +105,14 @@ namespace NGMemory.Easy
         /// <summary>
         /// Bewegt die Maus zur angegebenen Position mit menschlicher Bewegung und klickt.
         /// </summary>
-        public static void HumanClickAt(int x, int y, MouseButton button = MouseButton.Left)
+        public static void HumanClickAt(int x, int y, bool doubleClick = false, MouseButton button = MouseButton.Left, int moveTime = 500)
         {
-            MoveWithHumanMotion(x, y);
+            MoveWithHumanMotion(x, y, 500);
             Thread.Sleep(50 + new Random().Next(30));
-            Click(button);
+            if(doubleClick)
+                DoubleClick(button);
+            else
+                Click(button);
         }
 
         /// <summary>
