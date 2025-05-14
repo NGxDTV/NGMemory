@@ -41,5 +41,25 @@ namespace NGMemory.WinInteropTools
             };
             SendInput(1, new[] { inp }, Marshal.SizeOf(typeof(INPUT)));
         }
+
+        static void SendCtrlCInput()
+        {
+            Scan((ushort)KeyCode.LCtrl, false); // Ctrl↓
+            Scan((ushort)KeyCode.C, false); // C↓
+            Scan((ushort)KeyCode.C, true);  // C↑
+            Scan((ushort)KeyCode.LCtrl, true);  // Ctrl↑
+        }
+
+        static void CopyCore(IntPtr hWnd)
+        {
+            if (!PostMessage(hWnd, WM_COPY, IntPtr.Zero, IntPtr.Zero))
+                SendCtrlCInput();
+        }
+
+        public static void CopySelection(IntPtr hWnd, bool async)
+        {
+            if (async) ThreadPool.QueueUserWorkItem(_ => CopyCore(hWnd));
+            else CopyCore(hWnd);
+        }
     }
 }
