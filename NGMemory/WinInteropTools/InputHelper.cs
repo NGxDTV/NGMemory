@@ -67,10 +67,35 @@ namespace NGMemory.WinInteropTools
             Scan((ushort)KeyCode.LCtrl, true);  // Ctrl↑
         }
 
+        private static void SendCtrlAInput()
+        {
+            Scan((ushort)KeyCode.LCtrl, false); // Ctrl down
+            Scan((ushort)KeyCode.A, false); // A down
+            Scan((ushort)KeyCode.A, true);  // A up
+            Scan((ushort)KeyCode.LCtrl, true);  // Ctrl up
+        }
+
         static void CopyCore(IntPtr hWnd)
         {
             if (!PostMessage(hWnd, WM_COPY, IntPtr.Zero, IntPtr.Zero))
                 SendCtrlCInput();
+        }
+
+        private static void CopyAllCore(IntPtr hWnd)
+        {
+            SetForegroundWindow(hWnd);
+            Thread.Sleep(50);
+            SendCtrlAInput();
+            Thread.Sleep(50);
+            SendCtrlCInput();
+        }
+
+        public static void CopyAll(IntPtr hWnd, bool async)
+        {
+            if (async)
+                ThreadPool.QueueUserWorkItem(_ => CopyAllCore(hWnd));
+            else
+                CopyAllCore(hWnd);
         }
 
         public static void CopySelection(IntPtr hWnd, bool async)
