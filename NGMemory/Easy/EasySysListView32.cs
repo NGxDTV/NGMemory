@@ -16,6 +16,22 @@ namespace NGMemory.Easy
         [DllImport("user32.dll", SetLastError = true)]
         public static extern bool PostMessage(IntPtr hWnd, uint Msg, int wParam, int lParam);
 
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern bool WriteProcessMemory(
+            IntPtr hProcess,
+            IntPtr lpBaseAddress,
+            IntPtr lpBuffer,
+            int nSize,
+            out IntPtr lpNumberOfBytesWritten);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern bool ReadProcessMemory(
+            IntPtr hProcess,
+            IntPtr lpBaseAddress,
+            IntPtr lpBuffer,
+            int nSize,
+            out IntPtr lpNumberOfBytesRead);
+
         // Native Konstante
         private const int LVM_DELETEALLITEMS = 0x1009;
         private const int LVM_DELETEITEM = 0x1008;
@@ -23,6 +39,61 @@ namespace NGMemory.Easy
         private const int LVM_SETITEM = 0x1006;
         private const int LVM_GETHEADER = 0x101F;
         private const int HDM_GETITEMCOUNT = 0x1200;
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        private struct HDITEM
+        {
+            public uint mask;
+            public int cxy;
+            public IntPtr pszText;
+            public int cchTextMax;
+            public int fmt;
+            public IntPtr lParam;
+            public int iImage;
+            public int iOrder;
+        }
+
+        private const int LVM_GETCOLUMN = 0x105F;
+        private const int LVCF_TEXT = 0x0004;
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        private struct LVCOLUMN
+        {
+            public uint mask; public int fmt; public int cx;
+            public IntPtr pszText; public int cchTextMax; public int iSubItem;
+            public int iImage; public int iOrder; public int cxMin;
+            public int cxDefault; public int cxIdeal;
+        }
+
+        private static string[] GetColumnHeadersSafe(IntPtr hWnd, int count)
+        {
+            const int BUF = 256;
+            User32.GetWindowThreadProcessId(hWnd, out int pid);
+            IntPtr hProc = Kernel32.OpenProcess(Constants.PROCESS_ALL_ACCESS, false, pid);
+
+            int size = Marshal.SizeOf<LVCOLUMN>();
+            IntPtr remote = Kernel32.VirtualAllocEx(hProc, IntPtr.Zero, (int)(size + BUF * 2), Constants.MEM_COMMIT, Constants.PAGE_READWRITE);
+            IntPtr local = Marshal.AllocHGlobal(size + BUF * 2);
+            var res = new string[count];
+
+            for (int i = 0; i < count; i++)
+            {
+                var col = new LVCOLUMN { mask = LVCF_TEXT, pszText = remote + size, cchTextMax = BUF };
+                Marshal.StructureToPtr(col, local, false);
+
+                IntPtr bytes;
+                WriteProcessMemory(hProc, remote, local, size, out bytes);
+
+                NGMemory.User32.SendMessage(hWnd, LVM_GETCOLUMN, (IntPtr)i, remote);
+                ReadProcessMemory(hProc, remote + size, local + size, BUF * 2, out bytes);
+                res[i] = Marshal.PtrToStringUni(local + size);
+            }
+
+            Marshal.FreeHGlobal(local);
+            Kernel32.VirtualFreeEx(hProc, remote, 0, Constants.MEM_RELEASE);
+            Kernel32.CloseHandle(hProc);
+            return res;
+        }
 
         /// <summary>
         /// Liefert die Anzahl der Spalten über das Header-Control.
@@ -195,6 +266,21 @@ namespace NGMemory.Easy
                 Thread.Sleep(100);
             }
             PostMessage(listViewHandle, 0x0100, 0x0D, 0);
+        }
+
+        public static string CopyAllRowsTSV(IntPtr hWnd, bool withHeader = false)
+        {
+            int cols = GetColumnCount(hWnd);
+            var sb = new StringBuilder();
+
+            if (withHeader)
+                sb.AppendLine(string.Join("\t", GetColumnHeadersSafe(hWnd, cols)));
+
+            foreach (var row in GetAllRowsAsStrings(hWnd, cols))
+                sb.AppendLine(string.Join("\t", row));
+
+            Clipboard.SetText(sb.ToString(), TextDataFormat.Text);
+            return sb.ToString();
         }
 
         public static void SelectItemByName(IntPtr listViewHandle, string ContainsName)
