@@ -21,6 +21,7 @@
    13. [EasySysListView32](#easysyslistview32)
    14. [EasyWait](#easywait)
    15. [EasyWindow](#easywindow)
+   16. [EasyOverlay, OverlayManager & OverlayConfiguration](#easyoverlay-overlaymanager--overlayconfiguration)
 4. [WinInteropTools](#wininteroptools)
 
    1. [GuiInteropHandler](#guiinterophandler)
@@ -50,6 +51,7 @@ NGMemory 1.0.6 provides:
 * **Memory Access**: Read/write process memory, pattern scanning.
 * **Debugging**: Set hardware breakpoints and read registers.
 * **Screen Analysis**: Screenshots, color search, image matching.
+* **Overlay UI**: Create transparent overlays on top of target application windows for interactive UI (labels, buttons, etc.).
 
 ## Installation
 
@@ -272,6 +274,118 @@ Window handling:
 * `Find(processName, partialTitle?)` / `FindAndFocus(...)` → IntPtr
 * `GetMainWindow(processName, partialTitle?)`, `FocusWindow(hWnd)`
 * `GetAllChildWindows(parent)` → List<IntPtr>
+
+### EasyOverlay, OverlayManager & OverlayConfiguration
+
+Create transparent overlays attached to target application windows, position them, and add UI controls with a fluent API.
+
+• EasyOverlay
+  - Creates a new overlay for a target window handle (`IntPtr`).
+  - Positions: TopLeft, TopRight, BottomLeft, BottomRight, Center.
+  - Transparent background support, borderless child window of the target.
+  - Auto-repositions on target window size/move changes.
+
+• OverlayManager
+  - `CreateOverlay(hWnd, configure?)` → EasyOverlay
+  - `CreateOverlayForWindow(processName, titleFilter, configure?)` → EasyOverlay?
+  - `CreateOverlaysForAllMatching(processName, titleFilter, configure?)` → int
+  - `StartWindowScan(processName, titleFilter, intervalMs, configure?)` → Timer
+  - `RemoveOverlay(hWnd)` / `RemoveAllOverlays()`
+
+• OverlayConfiguration (fluent API)
+  - `WithSize(width, height)`
+  - `WithPosition(OverlayPosition)` and `WithOffset(x, y)`
+  - `WithBackgroundColor(color)`
+  - `WithLabel(text, x, y, foreColor?, font?)`
+  - `WithButton(text, x, y, width, height, onClick, backColor?, foreColor?)`
+  - `WithAutoPosition(enabled, intervalMs)`
+  - `WithControl(control)` / `WithCustomization(action)`
+
+OverlayPosition enum: `TopLeft`, `TopRight`, `BottomLeft`, `BottomRight`, `Center`.
+
+**Quick start (attach one overlay to a found window):**
+
+```csharp
+using System;
+using System.Diagnostics;
+using System.Drawing;
+using NGMemory.Easy;
+
+// Find a target window (example: main window of process "twe")
+IntPtr hwnd = NGMemory.Easy.EasyWindow.GetMainWindow("twe", ", Auftrag");
+if (hwnd != IntPtr.Zero)
+{
+   var mgr = new OverlayManager();
+   mgr.CreateOverlay(hwnd, overlay =>
+   {
+      overlay.Configure()
+         .WithSize(187, 70)
+         .WithPosition(OverlayPosition.BottomRight)
+         .WithOffset(5, 80)
+         .WithBackgroundColor(Color.Transparent)
+         .WithLabel("✔ Prüfung OK", 10, 5, Color.Green,
+            new Font("Segoe UI", 10, FontStyle.Bold))
+         .WithButton("Öffne Browser", 10, 30, 167, 30,
+            (s, e) => Process.Start(new ProcessStartInfo("https://example.com")
+            { UseShellExecute = true }),
+            Color.FromArgb(0, 122, 204), Color.White);
+   });
+}
+```
+
+**Auto-scan and attach overlays to matching windows:**
+
+```csharp
+using System;
+using System.Drawing;
+using NGMemory.Easy;
+
+var manager = new OverlayManager();
+// Scans every 1000 ms for windows of process "twe" whose title contains ", Auftrag"
+manager.StartWindowScan("twe", ", Auftrag", 1000, overlay =>
+{
+   overlay.Configure()
+      .WithSize(187, 70)
+      .WithPosition(OverlayPosition.BottomRight)
+      .WithOffset(5, 80)
+      .WithBackgroundColor(Color.Transparent)
+      .WithLabel("✔ Prüfung OK", 10, 5, Color.Green)
+      .WithButton("Öffne Browser", 10, 30, 167, 30,
+         (s, e) => System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("https://example.com")
+         { UseShellExecute = true }),
+         Color.FromArgb(0, 122, 204), Color.White);
+});
+```
+
+**Example inside a WinForms app (condensed):**
+
+```csharp
+public partial class Form1 : Form
+{
+   readonly OverlayManager overlayManager = new OverlayManager();
+
+   protected override void OnLoad(EventArgs e)
+   {
+      base.OnLoad(e);
+      overlayManager.StartWindowScan("twe", ", Auftrag", 1000, ConfigureOverlay);
+   }
+
+   private void ConfigureOverlay(EasyOverlay overlay)
+   {
+      overlay.Configure()
+         .WithSize(187, 70)
+         .WithPosition(OverlayPosition.BottomRight)
+         .WithOffset(5, 80)
+         .WithBackgroundColor(Color.Transparent)
+         .WithLabel("✔ Prüfung OK", 10, 5, Color.Green,
+            new Font("Segoe UI", 10, FontStyle.Bold))
+         .WithButton("Öffne Browser", 10, 30, 167, 30,
+            (s, e) => Process.Start(new ProcessStartInfo("https://example.com")
+            { UseShellExecute = true }),
+            Color.FromArgb(0, 122, 204), Color.White);
+   }
+}
+```
 
 ## WinInteropTools
 

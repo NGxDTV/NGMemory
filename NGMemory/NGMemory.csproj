@@ -92,6 +92,9 @@
     <Compile Include="Easy\EasyKeyboard.cs" />
     <Compile Include="Easy\EasyMemory.cs" />
     <Compile Include="Easy\EasyMouse.cs" />
+    <Compile Include="Easy\EasyOverlay.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Easy\EasyPressKey.cs" />
     <Compile Include="Easy\EasyScreen.cs" />
     <Compile Include="Easy\EasyScreenAnalysis.cs" />
@@ -99,6 +102,8 @@
     <Compile Include="Easy\EasyTextBox.cs" />
     <Compile Include="Easy\EasyWait.cs" />
     <Compile Include="Easy\EasyWindow.cs" />
+    <Compile Include="Easy\OverlayConfiguration.cs" />
+    <Compile Include="Easy\OverlayManager.cs" />
     <Compile Include="NGMemory\Constants.cs" />
     <Compile Include="NGMemory\DebugHook.cs" />
     <Compile Include="NGMemory\Enums.cs" />
@@ -122,6 +127,7 @@
     <Compile Include="WinInteropTools\MenuStripHelper.cs" />
     <Compile Include="WinInteropTools\SysListView32.cs" />
     <Compile Include="WinInteropTools\TextBox.cs" />
+    <Compile Include="WinInteropTools\WindowStyleHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\Settings.settings">
