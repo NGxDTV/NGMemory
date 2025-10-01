@@ -69,6 +69,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="C:/Users/m.kriebel/Documents/GitHub/NGMemory/NGMemory/Easy/\EasyOverlay.cs">
+      <Link>EasyOverlay.cs</Link>
+    </Compile>
+    <Compile Include="C:/Users/m.kriebel/Documents/GitHub/NGMemory/NGMemory/Easy/\OverlayConfiguration.cs">
+      <Link>OverlayConfiguration.cs</Link>
+    </Compile>
+    <Compile Include="C:/Users/m.kriebel/Documents/GitHub/NGMemory/NGMemory/Easy/\OverlayManager.cs">
+      <Link>OverlayManager.cs</Link>
+    </Compile>
+    <Compile Include="C:/Users/m.kriebel/Documents/GitHub/NGMemory/NGMemory/WinInteropTools/\WindowStyleHelper.cs">
+      <Link>WindowStyleHelper.cs</Link>
+    </Compile>
     <Compile Include="Easy\EasyButton.cs" />
     <Compile Include="Easy\EasyCheckBox.cs" />
     <Compile Include="Easy\EasyComboBox.cs" />

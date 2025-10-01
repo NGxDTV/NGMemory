@@ -11,6 +11,9 @@ namespace NGMemory
 {
     public class User32
     {
+        // Adding missing delegate for EnumChildWindows
+        public delegate bool EnumChildProc(IntPtr hWnd, IntPtr lParam);
+
         [DllImport("user32.dll", SetLastError = false)]
         public static extern IntPtr GetDlgItem(IntPtr hDlg, int nIDDlgItem);
 
@@ -40,6 +43,10 @@ namespace NGMemory
 
         [DllImport("user32.dll")]
         public static extern bool EnumThreadWindows(int dwThreadId, EnumDelegate lpfn, IntPtr lParam);
+
+        // Adding missing EnumChildWindows
+        [DllImport("user32.dll")]
+        public static extern bool EnumChildWindows(IntPtr hWndParent, EnumChildProc lpEnumFunc, IntPtr lParam);
 
         [DllImport("user32.dll")]
         public static extern IntPtr FindWindowEx(IntPtr parentHWnd, IntPtr childAfterHWnd, string className, string windowTitle);
@@ -89,6 +96,20 @@ namespace NGMemory
 
         [DllImport("user32.dll")]
         public static extern bool SetCursorPos(int X, int Y);
+
+        // Adding IsWindow
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool IsWindow(IntPtr hWnd);
+
+        // Adding GetClientRect
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
+
+        // Adding SetWindowPos
+        [DllImport("user32.dll")]
+        public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 
         [StructLayout(LayoutKind.Sequential)]
         public struct RECT
