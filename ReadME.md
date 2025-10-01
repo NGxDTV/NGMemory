@@ -1,4 +1,4 @@
-# NGMemory 1.0.6
+# NGMemory 1.0.7
 
 ## Table of Contents
 
@@ -45,7 +45,7 @@
 
 ## Overview
 
-NGMemory 1.0.6 provides:
+NGMemory 1.0.7 provides:
 
 * **GUI Automation**: Click buttons, set text, interact with ComboBox, CheckBox, etc.
 * **Memory Access**: Read/write process memory, pattern scanning.
@@ -56,7 +56,7 @@ NGMemory 1.0.6 provides:
 ## Installation
 
 ```powershell
-Install-Package NGMemory -Version 1.0.6
+Install-Package NGMemory -Version 1.0.7
 ```
 
 ```csharp
