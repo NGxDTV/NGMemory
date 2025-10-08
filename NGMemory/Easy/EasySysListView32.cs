@@ -32,13 +32,34 @@ namespace NGMemory.Easy
             int nSize,
             out IntPtr lpNumberOfBytesRead);
 
-        // Native Konstante
-        private const int LVM_DELETEALLITEMS = 0x1009;
-        private const int LVM_DELETEITEM = 0x1008;
-        private const int LVM_INSERTITEM = 0x1007;
-        private const int LVM_SETITEM = 0x1006;
-        private const int LVM_GETHEADER = 0x101F;
-        private const int HDM_GETITEMCOUNT = 0x1200;
+        // LVM & Header
+        private const int LVM_FIRST = 0x1000;
+        private const int LVM_DELETEALLITEMS = LVM_FIRST + 9;    // 0x1009
+        private const int LVM_DELETEITEM = LVM_FIRST + 8;    // 0x1008
+        private const int LVM_INSERTITEM = LVM_FIRST + 7;    // 0x1007
+        private const int LVM_SETITEM = LVM_FIRST + 6;    // 0x1006
+        private const int LVM_GETHEADER = LVM_FIRST + 31;   // 0x101F
+        private const int LVM_GETITEMCOUNT = LVM_FIRST + 4;    // 0x1004
+        private const int LVM_GETITEMTEXTW = LVM_FIRST + 115;  // 0x1073 (Unicode)
+        private const int LVM_GETCOLUMN = LVM_FIRST + 95;   // 0x105F
+        private const int LVM_ENSUREVISIBLE = LVM_FIRST + 19;   // 0x1013
+        private const int LVM_GETTOPINDEX = LVM_FIRST + 39;   // 0x1027
+        private const int LVM_GETCOUNTPERPAGE = LVM_FIRST + 40;   // 0x1028
+
+        private const int HDM_FIRST = 0x1200;
+        private const int HDM_GETITEMCOUNT = HDM_FIRST + 0;       // 0x1200
+
+        // Scrolling
+        private const int WM_VSCROLL = 0x0115;
+        private const int SB_LINEUP = 0;
+        private const int SB_LINEDOWN = 1;
+        private const int SB_PAGEUP = 2;
+        private const int SB_PAGEDOWN = 3;
+        private const int SB_TOP = 6;
+        private const int SB_BOTTOM = 7;
+
+        private const uint LVIF_TEXT = 0x0001;
+        private const int LVCF_TEXT = 0x0004;
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         private struct HDITEM
@@ -53,9 +74,6 @@ namespace NGMemory.Easy
             public int iOrder;
         }
 
-        private const int LVM_GETCOLUMN = 0x105F;
-        private const int LVCF_TEXT = 0x0004;
-
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         private struct LVCOLUMN
         {
@@ -68,7 +86,7 @@ namespace NGMemory.Easy
         private static string[] GetColumnHeadersSafe(IntPtr hWnd, int count)
         {
             const int BUF = 256;
-            User32.GetWindowThreadProcessId(hWnd, out int pid);
+            NGMemory.User32.GetWindowThreadProcessId(hWnd, out int pid);
             IntPtr hProc = Kernel32.OpenProcess(Constants.PROCESS_ALL_ACCESS, false, pid);
 
             int size = Marshal.SizeOf<LVCOLUMN>();
@@ -95,9 +113,6 @@ namespace NGMemory.Easy
             return res;
         }
 
-        /// <summary>
-        /// Liefert die Anzahl der Spalten über das Header-Control.
-        /// </summary>
         public static int GetColumnCount(IntPtr listViewHandle)
         {
             var header = NGMemory.User32.SendMessage(listViewHandle, LVM_GETHEADER, IntPtr.Zero, IntPtr.Zero);
@@ -105,77 +120,46 @@ namespace NGMemory.Easy
             return NGMemory.User32.SendMessage(header, HDM_GETITEMCOUNT, IntPtr.Zero, IntPtr.Zero).ToInt32();
         }
 
-        /// <summary>
-        /// Liest alle Zeilen anhand der Spaltenanzahl.
-        /// </summary>
         public static List<ListViewItem> GetItems(IntPtr listViewHandle, int columnCount)
         {
             return WinInteropTools.SysListView32.GetListViewItems(listViewHandle, columnCount);
         }
 
-        /// <summary>
-        /// Liest alle Zeilen, ermittelt Spaltenanzahl automatisch (autoColumnCount=true).
-        /// </summary>
         public static List<ListViewItem> GetItems(IntPtr listViewHandle, bool autoColumnCount)
         {
             int count = autoColumnCount ? GetColumnCount(listViewHandle) : 1;
             return GetItems(listViewHandle, count);
         }
 
-        /// <summary>
-        /// Liest den Text einer Zeile (itemIndex) und Spalte (subIndex).
-        /// </summary>
         public static string ReadItemText(IntPtr listViewHandle, int itemIndex, int subIndex)
         {
             return WinInteropTools.SysListView32.ReadListViewItem(listViewHandle, itemIndex, subIndex);
         }
 
-        /// <summary>
-        /// Liefert die Anzahl der Zeilen (Items) in der ListView.
-        /// </summary>
         public static int GetItemCount(IntPtr listViewHandle)
         {
-            // Auslesen mit Spaltenanzahl 1 und einfach zählen.
-            return GetItems(listViewHandle, 1).Count;
+            return NGMemory.User32.SendMessage(listViewHandle, LVM_GETITEMCOUNT, IntPtr.Zero, IntPtr.Zero).ToInt32();
         }
 
-        /// <summary>
-        /// Liest alle Zeilen/Spalten als reine String-Listen.
-        /// </summary>
         public static List<string[]> GetAllRowsAsStrings(IntPtr listViewHandle, int columnCount)
         {
-            var items = GetItems(listViewHandle, columnCount);
-            var result = new List<string[]>();
-
-            foreach (var itm in items)
-            {
-                var temp = new List<string> { itm.Text };
-                for (int i = 1; i < itm.SubItems.Count; i++)
-                    temp.Add(itm.SubItems[i].Text);
-                result.Add(temp.ToArray());
-            }
-            return result;
+            return GetAllRowsViaLvm(listViewHandle, columnCount, 2048);
         }
 
-        /// <summary>
-        /// Liest alle Zeilen als String-Listen, Spaltenanzahl wird automatisch erkannt.
-        /// </summary>
         public static List<string[]> GetAllRowsAsStrings(IntPtr listViewHandle, bool autoColumnCount)
         {
             int c = autoColumnCount ? GetColumnCount(listViewHandle) : 1;
-            return GetAllRowsAsStrings(listViewHandle, c);
+            return GetAllRowsViaLvm(listViewHandle, c, 2048);
         }
 
-        /// <summary>
-        /// Fügt ein Item in die ListView ein. Nur Text in der ersten Spalte.
-        /// </summary>
         public static void InsertItem(IntPtr listViewHandle, int index, string text)
         {
-            // Minimaler LV_ITEM für das Einfügen
-            var lvItem = new LV_ITEM();
-            lvItem.iItem = index;
-            lvItem.mask = 0x0001; // LVIF_TEXT
-            lvItem.pszText = Marshal.StringToHGlobalUni(text);
+            var lvItem = new LV_ITEM
+            {
+                iItem = index,
+                mask = LVIF_TEXT,
+                pszText = Marshal.StringToHGlobalUni(text)
+            };
 
             IntPtr pLvItem = Marshal.AllocHGlobal(Marshal.SizeOf(lvItem));
             Marshal.StructureToPtr(lvItem, pLvItem, false);
@@ -184,17 +168,11 @@ namespace NGMemory.Easy
             Marshal.FreeHGlobal(pLvItem);
         }
 
-        /// <summary>
-        /// Entfernt ein Item aus der ListView über den Index.
-        /// </summary>
         public static void RemoveItem(IntPtr listViewHandle, int index)
         {
             NGMemory.User32.SendMessage(listViewHandle, LVM_DELETEITEM, (IntPtr)index, IntPtr.Zero);
         }
 
-        /// <summary>
-        /// Löscht alle Items aus der ListView.
-        /// </summary>
         public static void ClearAllItems(IntPtr listViewHandle)
         {
             NGMemory.User32.SendMessage(listViewHandle, LVM_DELETEALLITEMS, IntPtr.Zero, IntPtr.Zero);
@@ -215,7 +193,6 @@ namespace NGMemory.Easy
                 if (sb.ToString() == "SysListView32")
                 {
                     return child;
-                    break;
                 }
             }
 
@@ -225,12 +202,11 @@ namespace NGMemory.Easy
         public static int GetListViewItemByName(IntPtr listViewHandle, string ContainsName)
         {
             List<string[]> data = NGMemory.Easy.EasySysListView32.GetAllRowsAsStrings(listViewHandle, true);
-
             int index = 0;
 
             for (int i = 0; i < data.Count(); i++)
             {
-                if (data[i][0].Contains(ContainsName))
+                if (data[i].Length > 0 && data[i][0].Contains(ContainsName))
                 {
                     index = i;
                     break;
@@ -240,16 +216,15 @@ namespace NGMemory.Easy
             return index;
         }
 
-        /// <summary>
-        /// Setzt den Text eines bestimmten Items in Spalte 0 (bzw. SubItem=0).
-        /// </summary>
         public static void SetItemText(IntPtr listViewHandle, int itemIndex, string newText)
         {
-            var lvItem = new LV_ITEM();
-            lvItem.iSubItem = 0;
-            lvItem.iItem = itemIndex;
-            lvItem.mask = 0x0001; // LVIF_TEXT
-            lvItem.pszText = Marshal.StringToHGlobalUni(newText);
+            var lvItem = new LV_ITEM
+            {
+                iSubItem = 0,
+                iItem = itemIndex,
+                mask = LVIF_TEXT,
+                pszText = Marshal.StringToHGlobalUni(newText)
+            };
 
             IntPtr pLvItem = Marshal.AllocHGlobal(Marshal.SizeOf(lvItem));
             Marshal.StructureToPtr(lvItem, pLvItem, false);
@@ -262,21 +237,22 @@ namespace NGMemory.Easy
         {
             for (int i = 0; i < index; i++)
             {
-                PostMessage(listViewHandle, 0x0100, 0x28, 0);
+                PostMessage(listViewHandle, 0x0100, 0x28, 0); // VK_DOWN
                 Thread.Sleep(100);
             }
-            PostMessage(listViewHandle, 0x0100, 0x0D, 0);
+            PostMessage(listViewHandle, 0x0100, 0x0D, 0); // VK_RETURN
         }
 
         public static string CopyAllRowsTSV(IntPtr hWnd, bool withHeader = false)
         {
+            HydrateAllItems(hWnd);
             int cols = GetColumnCount(hWnd);
             var sb = new StringBuilder();
 
             if (withHeader)
                 sb.AppendLine(string.Join("\t", GetColumnHeadersSafe(hWnd, cols)));
 
-            foreach (var row in GetAllRowsAsStrings(hWnd, cols))
+            foreach (var row in GetAllRowsViaLvm(hWnd, cols, 2048))
                 sb.AppendLine(string.Join("\t", row));
 
             Clipboard.SetText(sb.ToString(), TextDataFormat.Text);
@@ -289,7 +265,98 @@ namespace NGMemory.Easy
             SelectItemByIndex(listViewHandle, index);
         }
 
-        // Einfacher LV_ITEM für unsere Zwecke (nur Unicode-Text).
+        private static int GetTopIndex(IntPtr hWnd) =>
+            NGMemory.User32.SendMessage(hWnd, LVM_GETTOPINDEX, IntPtr.Zero, IntPtr.Zero).ToInt32();
+
+        private static int GetCountPerPage(IntPtr hWnd) =>
+            NGMemory.User32.SendMessage(hWnd, LVM_GETCOUNTPERPAGE, IntPtr.Zero, IntPtr.Zero).ToInt32();
+
+        /// <summary>
+        /// Scrollt die ListView seitenweise nach unten, bis keine neuen Items/Positionen mehr geladen werden.
+        /// Anschließend zurück zum Anfang.
+        /// </summary>
+        private static void HydrateAllItems(IntPtr hWnd, int stablePasses = 5, int maxPasses = 2000)
+        {
+            int stable = 0;
+            for (int i = 0; i < maxPasses && stable < stablePasses; i++)
+            {
+                int beforeCount = GetItemCount(hWnd);
+                int beforeTop = GetTopIndex(hWnd);
+
+                NGMemory.User32.SendMessage(hWnd, WM_VSCROLL, (IntPtr)SB_PAGEDOWN, IntPtr.Zero);
+                int cpp = GetCountPerPage(hWnd); if (cpp < 1) cpp = 50;
+                NGMemory.User32.SendMessage(hWnd, LVM_ENSUREVISIBLE, (IntPtr)(beforeTop + cpp - 1), IntPtr.Zero);
+
+                Thread.Sleep(15);
+
+                int afterCount = GetItemCount(hWnd);
+                int afterTop = GetTopIndex(hWnd);
+
+                if (afterCount == beforeCount && afterTop == beforeTop) stable++;
+                else stable = 0;
+            }
+
+            NGMemory.User32.SendMessage(hWnd, WM_VSCROLL, (IntPtr)SB_TOP, IntPtr.Zero);
+            Thread.Sleep(10);
+        }
+
+        private static List<string[]> GetAllRowsViaLvm(IntPtr hWnd, int columnCount, int maxCharsPerCell)
+        {
+            HydrateAllItems(hWnd);
+
+            var rows = new List<string[]>();
+
+            NGMemory.User32.GetWindowThreadProcessId(hWnd, out int pid);
+            IntPtr hProc = Kernel32.OpenProcess(Constants.PROCESS_ALL_ACCESS, false, pid);
+
+            int lvSize = Marshal.SizeOf<LV_ITEM>();
+            int bufBytes = maxCharsPerCell * 2; // UTF-16
+            IntPtr remote = Kernel32.VirtualAllocEx(hProc, IntPtr.Zero, lvSize + bufBytes, Constants.MEM_COMMIT, Constants.PAGE_READWRITE);
+            IntPtr localLv = Marshal.AllocHGlobal(lvSize);
+            IntPtr localBuf = Marshal.AllocHGlobal(bufBytes);
+
+            try
+            {
+                int itemCount = NGMemory.User32.SendMessage(hWnd, LVM_GETITEMCOUNT, IntPtr.Zero, IntPtr.Zero).ToInt32();
+
+                for (int i = 0; i < itemCount; i++)
+                {
+                    var cells = new string[columnCount];
+
+                    for (int c = 0; c < columnCount; c++)
+                    {
+                        var lvi = new LV_ITEM
+                        {
+                            mask = LVIF_TEXT,
+                            iItem = i,
+                            iSubItem = c,
+                            cchTextMax = maxCharsPerCell,
+                            pszText = remote + lvSize // Textpuffer direkt hinter LV_ITEM
+                        };
+
+                        Marshal.StructureToPtr(lvi, localLv, false);
+                        WriteProcessMemory(hProc, remote, localLv, lvSize, out _);
+
+                        NGMemory.User32.SendMessage(hWnd, LVM_GETITEMTEXTW, (IntPtr)i, remote);
+
+                        ReadProcessMemory(hProc, remote + lvSize, localBuf, bufBytes, out _);
+                        cells[c] = Marshal.PtrToStringUni(localBuf) ?? string.Empty;
+                    }
+
+                    rows.Add(cells);
+                }
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(localLv);
+                Marshal.FreeHGlobal(localBuf);
+                Kernel32.VirtualFreeEx(hProc, remote, 0, Constants.MEM_RELEASE);
+                Kernel32.CloseHandle(hProc);
+            }
+
+            return rows;
+        }
+
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         private struct LV_ITEM
         {
