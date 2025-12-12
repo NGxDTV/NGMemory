@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
-using static NGMemory.User32; // Add static import
+using NGMemory.Easy;
 
-namespace NGMemory.Easy
+using static NGMemory.User32;
+
+namespace NGMemory.Overlay
 {
     /// <summary>
     /// Manages multiple overlays and provides methods to find and create overlays for specific windows.
