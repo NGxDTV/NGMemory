@@ -186,6 +186,14 @@ namespace NGMemory.Easy
             return this;
         }
 
+        /// <summary>
+        /// Hides the overlay from the Alt+Tab window switcher.
+        /// </summary>
+        public static void HideFromAltTab(IntPtr hWnd, IntPtr owner)
+        {
+            Overlay.OverlayStyleHelper.HideFromAltTab(hWnd, owner);
+        }
+
         #region Native Methods
         [DllImport("user32.dll")]
         static extern bool BringWindowToTop(IntPtr hWnd);
