@@ -100,8 +100,7 @@ namespace NGMemory.Overlay
         /// and removing the AppWindow style. Stores the old style for later restoration.
         /// </summary>
         /// <param name="hWnd">Handle of the window to modify.</param>
-        /// <param name="owner">Optional: owner of the window (currently unused).</param>
-        public static void HideFromAltTab(IntPtr hWnd, IntPtr owner)
+        public static void HideFromAltTab(IntPtr hWnd)
         {
             if (hWnd == IntPtr.Zero) return;
 

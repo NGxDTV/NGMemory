@@ -189,9 +189,9 @@ namespace NGMemory.Easy
         /// <summary>
         /// Hides the overlay from the Alt+Tab window switcher.
         /// </summary>
-        public static void HideFromAltTab(IntPtr hWnd, IntPtr owner)
+        public static void HideFromAltTab(IntPtr hWnd)
         {
-            Overlay.OverlayStyleHelper.HideFromAltTab(hWnd, owner);
+            Overlay.OverlayStyleHelper.HideFromAltTab(hWnd);
         }
 
         #region Native Methods
