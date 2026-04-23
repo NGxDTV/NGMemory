@@ -77,8 +77,7 @@ namespace NGMemory.WinInteropTools
 
         static void CopyCore(IntPtr hWnd)
         {
-            if (!PostMessage(hWnd, WM_COPY, IntPtr.Zero, IntPtr.Zero))
-                SendCtrlCInput();
+            SendMessage(hWnd, WM_COPY, IntPtr.Zero, IntPtr.Zero);
         }
 
         private static void CopyAllCore(IntPtr hWnd)
