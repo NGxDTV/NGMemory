@@ -107,7 +107,7 @@ namespace NGMemory.Easy
         /// </summary>
         public static void HumanClickAt(int x, int y, bool doubleClick = false, MouseButton button = MouseButton.Left, int moveTime = 500)
         {
-            MoveWithHumanMotion(x, y, 500);
+            MoveWithHumanMotion(x, y, moveTime);
             Thread.Sleep(50 + new Random().Next(30));
             if(doubleClick)
                 DoubleClick(button);

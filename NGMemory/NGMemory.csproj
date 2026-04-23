@@ -12,6 +12,7 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,7 +32,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PreferNativeArm64>false</PreferNativeArm64>
-    <GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
@@ -51,10 +52,10 @@
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x64</PlatformTarget>
-    <GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
-    <PreferNativeArm64>true</PreferNativeArm64>
+    <PreferNativeArm64>false</PreferNativeArm64>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -69,18 +70,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="C:/Users/m.kriebel/Documents/GitHub/NGMemory/NGMemory/Easy/\EasyOverlay.cs">
-      <Link>EasyOverlay.cs</Link>
-    </Compile>
-    <Compile Include="C:/Users/m.kriebel/Documents/GitHub/NGMemory/NGMemory/Easy/\OverlayConfiguration.cs">
-      <Link>OverlayConfiguration.cs</Link>
-    </Compile>
-    <Compile Include="C:/Users/m.kriebel/Documents/GitHub/NGMemory/NGMemory/Easy/\OverlayManager.cs">
-      <Link>OverlayManager.cs</Link>
-    </Compile>
-    <Compile Include="C:/Users/m.kriebel/Documents/GitHub/NGMemory/NGMemory/WinInteropTools/\WindowStyleHelper.cs">
-      <Link>WindowStyleHelper.cs</Link>
-    </Compile>
     <Compile Include="Easy\EasyButton.cs" />
     <Compile Include="Easy\EasyCheckBox.cs" />
     <Compile Include="Easy\EasyComboBox.cs" />
@@ -102,8 +91,8 @@
     <Compile Include="Easy\EasyTextBox.cs" />
     <Compile Include="Easy\EasyWait.cs" />
     <Compile Include="Easy\EasyWindow.cs" />
-    <Compile Include="Easy\OverlayConfiguration.cs" />
-    <Compile Include="Easy\OverlayManager.cs" />
+    <Compile Include="Overlay\OverlayConfiguration.cs" />
+    <Compile Include="Overlay\OverlayManager.cs" />
     <Compile Include="NGMemory\Constants.cs" />
     <Compile Include="NGMemory\DebugHook.cs" />
     <Compile Include="NGMemory\Enums.cs" />
@@ -113,6 +102,7 @@
     <Compile Include="NGMemory\Scanner.cs" />
     <Compile Include="NGMemory\Structures.cs" />
     <Compile Include="NGMemory\User32.cs" />
+    <Compile Include="Overlay\OverlayStyleHelper.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -135,6 +125,10 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Easy\EasyOverlay.resx">
+      <DependentUpon>EasyOverlay.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

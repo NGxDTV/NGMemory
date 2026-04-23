@@ -76,6 +76,8 @@ namespace NGMemory
         public IntPtr? ScanMemory(string pattern, long? baseAddress = null, long? maxMin = null)
         {
             ConvertStringToBytes(pattern, out byte[] signature, out bool[] mask);
+            if (signature.Length == 0 || processHandle == IntPtr.Zero)
+                return null;
 
             SYSTEM_INFO sysInfo = new SYSTEM_INFO();
             GetSystemInfo(out sysInfo);
@@ -112,6 +114,7 @@ namespace NGMemory
                 IntPtr regionBase = mbi.BaseAddress;
 
                 const int bufferSize = 0x10000;
+                int overlap = Math.Max(0, signature.Length - 1);
                 long bytesReadTotal = 0;
 
                 while (bytesReadTotal < regionSize)
@@ -136,7 +139,12 @@ namespace NGMemory
                             }
                         }
                     }
-                    bytesReadTotal += bytesToRead;
+
+                    int actualBytesRead = bytesRead.ToInt32();
+                    if (actualBytesRead <= 0)
+                        break;
+
+                    bytesReadTotal += Math.Max(1, actualBytesRead - overlap);
                 }
             }
 

@@ -1,481 +1,186 @@
-# NGMemory 1.0.7
+# NGMemory
 
-## Table of Contents
+NGMemory is a Windows-only .NET Framework library for external process memory access, basic debugging, GUI automation, screen analysis, and lightweight overlays.
 
-1. [Overview](#overview)
-2. [Installation](#installation)
-3. [NGMemory Easy API](#ngmemory-easy-api)
+## Features
 
-   1. [EasyButton](#easybutton)
-   2. [EasyCheckBox](#easycheckbox)
-   3. [EasyComboBox](#easycombobox)
-   4. [EasyTextBox](#easytextbox)
-   5. [EasyFormHelper](#easyformhelper)
-   6. [EasyGuiInterop](#easyguiinterop)
-   7. [EasyKeyboard & EasyPressKey](#easykeyboard--easypresskey)
-   8. [EasyMouse](#easymouse)
-   9. [EasyElementFinder](#easyelementfinder)
-   10. [EasyDebugHook](#easydebughook)
-   11. [EasyMemory](#easymemory)
-   12. [EasyScreen & EasyScreenAnalysis](#easyscreen--easyscreenanalysis)
-   13. [EasySysListView32](#easysyslistview32)
-   14. [EasyWait](#easywait)
-   15. [EasyWindow](#easywindow)
-   16. [EasyOverlay, OverlayManager & OverlayConfiguration](#easyoverlay-overlaymanager--overlayconfiguration)
-4. [WinInteropTools](#wininteroptools)
+- Read and write memory in external processes
+- Scan process memory for byte patterns with wildcard support
+- Wait for hardware breakpoints and inspect CPU registers
+- Automate classic Win32 controls such as buttons, text boxes, combo boxes, check boxes, and list views
+- Simulate keyboard and mouse input
+- Capture screenshots, search colors, and compare images
+- Attach transparent overlay forms to target windows
 
-   1. [GuiInteropHandler](#guiinterophandler)
-   2. [CheckBox & ComboBox](#checkbox--combobox)
-   3. [InputHelper](#inputhelper)
-   4. [MenuStripHelper](#menustriphelper)
-   5. [SysListView32](#syslistview32)
-   6. [TextBox](#textbox)
-5. [Core Library (NGMemory)](#core-library-ngmemory)
+## Requirements
 
-   1. [Constants, Enums, Structures](#constants-enums-structures)
-   2. [User32, Kernel32 & MessageHelper](#user32-kernel32--messagehelper)
-   3. [DebugHook](#debughook)
-   4. [Scanner](#scanner)
-   5. [Module](#module)
-   6. [VAMemory](#vamemory)
-6. [Examples](#examples)
-7. [License](#license)
-
----
-
-## Overview
-
-NGMemory 1.0.7 provides:
-
-* **GUI Automation**: Click buttons, set text, interact with ComboBox, CheckBox, etc.
-* **Memory Access**: Read/write process memory, pattern scanning.
-* **Debugging**: Set hardware breakpoints and read registers.
-* **Screen Analysis**: Screenshots, color search, image matching.
-* **Overlay UI**: Create transparent overlays on top of target application windows for interactive UI (labels, buttons, etc.).
+- Windows
+- .NET Framework 4.7.2
+- A desktop application target (Win32/WinForms style controls are the main focus)
+- Sufficient process permissions for memory and debug operations
 
 ## Installation
+
+### NuGet
 
 ```powershell
 Install-Package NGMemory -Version 1.0.7
 ```
 
+### Source
+
+```powershell
+dotnet build NGMemory.sln
+```
+
+## Namespaces
+
 ```csharp
 using NGMemory;
 using NGMemory.Easy;
+using NGMemory.Overlay;
 using NGMemory.WinInteropTools;
 ```
 
-## NGMemory Easy API
+## Project Layout
 
-### EasyButton
+- `NGMemory/NGMemory`: core interop, scanner, debug hook, constants, enums, structures
+- `NGMemory/VAMemory`: generic typed memory read/write wrapper
+- `NGMemory/WinInteropTools`: low-level control and window interop helpers
+- `NGMemory/Easy`: higher-level convenience API
+- `NGMemory/Overlay`: overlay manager, configuration, and style helpers
 
-Simulate button clicks by control ID.
+## Quick Start
 
-* `Click(windowHandle, controlId)`
-* `ClickAsync(windowHandle, controlId)`
-
-**Example:**
-
-```csharp
-EasyButton.Click(hwnd, 1001);
-EasyButton.ClickAsync(hwnd, 1002);
-```
-
-### EasyCheckBox
-
-CheckBox helpers:
-
-* `IsChecked(windowHandle, controlId)` → bool
-* `SetChecked(windowHandle, controlId, state)`
-* `ToggleState(windowHandle, controlId)`
-* `ClickCheckBox(windowHandle, controlId)`
-
-**Example:**
+### Read and write memory
 
 ```csharp
-bool on = EasyCheckBox.IsChecked(hwnd, 2001);
-EasyCheckBox.ToggleState(hwnd, 2001);
+using NGMemory;
+
+var memory = new VAMemory("notepad");
+if (memory.CheckProcess())
+{
+    int value = memory.ReadInt32((IntPtr)0x12345678);
+    memory.WriteInt32((IntPtr)0x12345678, value + 1);
+}
 ```
 
-### EasyComboBox
-
-ComboBox helpers:
-
-* `GetSelectedItem(comboHandle)` → string or null
-* `GetItems(comboHandle)` → string\[]
-* `SelectItemByString(comboHandle, text)`
-* `SelectItemByIndex(comboHandle, index)`
-
-**Example:**
-
-```csharp
-var items = EasyComboBox.GetItems(combo);
-EasyComboBox.SelectItemByString(combo, "Option A");
-```
-
-### EasyTextBox
-
-TextBox helpers:
-
-* `GetText(windowHandle, controlId)` → string
-* `SetText(windowHandle, controlId, text)`
-* `ClearText(windowHandle, controlId)`
-
-**Example:**
-
-```csharp
-string text = EasyTextBox.GetText(hwnd, 3001);
-EasyTextBox.ClearText(hwnd, 3001);
-```
-
-### EasyFormHelper
-
-Batch operations on multiple controls:
-
-* `SetTextFields(windowHandle, Dictionary<int,string>)`
-* `GetTextFields(windowHandle, params int[])` → Dictionary\<int,string>
-* `SetCheckBoxes(windowHandle, Dictionary<int,bool>)`
-* `GetCheckBoxes(windowHandle, params int[])` → Dictionary\<int,bool>
-* `SetComboBoxes(windowHandle, Dictionary<int,string>)`
-* `GetComboBoxes(windowHandle, params int[])` → Dictionary\<int,string>
-
-**Example:**
-
-```csharp
-var textMap = new Dictionary<int,string>{{3001,"A"},{3002,"B"}};
-EasyFormHelper.SetTextFields(hwnd, textMap);
-```
-
-### EasyGuiInterop
-
-Low-level window and control handles:
-
-* `GetControlHandle(windowHandle, controlId)` → IntPtr
-* `GetChildWindows(parentHandle)` → List<IntPtr>
-* `GetWindowTitle(hWnd)` → string
-* `SetText(dialogHandle, controlId, text)`
-
-### EasyKeyboard & EasyPressKey
-
-Keyboard input:
-
-* `TypeText(text, delay)` / `TypeTextAsync(text, delay)`
-* `SendCtrlC()`, `SendCtrlV()`
-* `PressKeys(async, KeyCode...)` / `PressKeysAsync(KeyCode...)`
-* \`PressKeysWithDelay(delay, KeyCode...)
-
-**Example:**
-
-```csharp
-EasyKeyboard.TypeText("Hello World", 10);
-EasyPressKey.PressKeys(false, KeyCode.LCtrl, KeyCode.C);
-```
-
-### EasyMouse
-
-Mouse operations:
-
-* `MoveTo(x,y)`
-* `MoveWithHumanMotion(x,y,duration)`
-* `Click(button)`, `ClickAt(x,y,button)`
-* `HumanClickAt(x,y,button)`
-* `DoubleClick(button)`
-* \`DragAndDrop(fromX,fromY,toX,toY)
-
-**Example:**
-
-```csharp
-EasyMouse.HumanClickAt(100,200);
-```
-
-### EasyElementFinder
-
-Search UI elements by criteria:
-
-* `FindElement(parent, className?, windowText?, controlId?)` → IntPtr
-* `GetWindowRect(hWnd)` → Rectangle
-
-**Example:**
-
-```csharp
-IntPtr btn = EasyElementFinder.FindElement(mainHwnd, className:"Button", windowText:"OK");
-```
-
-### EasyDebugHook
-
-Wait for hardware breakpoint and read register:
-
-* `WaitForRegister(processName or ID, address, Register)` → ulong
-
-**Example:**
-
-```csharp
-ulong value = EasyDebugHook.WaitForRegister("notepad", addr, Register.Rax);
-```
-
-### EasyMemory
-
-Memory pattern scanning and reading strings:
-
-* `FindPattern(processName, pattern, startAddr?, endAddr?)` → IntPtr
-* `ReadString(processName, address, maxLength, encoding?)` → string
-
-**Example:**
-
-```csharp
-IntPtr addr = EasyMemory.FindPattern("game", "90 90 ?? 90");
-string title = EasyMemory.ReadString("game", addr);
-```
-
-### EasyScreen & EasyScreenAnalysis
-
-Screen capture and analysis:
-
-* `CaptureScreen()`, `CaptureRegion(x,y,w,h)`, `CaptureWindow(hWnd)`
-* `FindColor(color, area, tolerance)` → Point?
-* `FindAllColorMatches(color, area, tolerance)` → List<Point>
-* `CompareImages(img1,img2,samplingRate)` → double%
-* `FindImageOnScreen(template, area, minSimilarity)` → Point?
-
-**Example:**
-
-```csharp
-var matches = EasyScreenAnalysis.FindAllColorMatches(Color.Red, new Rectangle(0,0,50,50));
-```
-
-### EasySysListView32
-
-ListView control helpers:
-
-* `GetItems(handle, columnCount or auto)` → List<ListViewItem>
-* `GetAllRowsAsStrings(handle, columnCount or auto)` → List\<string\[]>
-* `InsertItem(handle,index,text)`, `RemoveItem(handle,index)`, `ClearAllItems(handle)`
-* `SetItemText(handle,index,text)`, `SelectItemByName(handle,name)`
-
-**Example:**
-
-```csharp
-var rows = EasySysListView32.GetAllRowsAsStrings(lvHwnd, true);
-EasySysListView32.InsertItem(lvHwnd, 0, "New");
-```
-
-### EasyWait
-
-Waiting utilities:
-
-* `Until(condition, timeout, interval)` → bool
-* `ForDuration(ms)`
-* `RetryUntilSuccess(action, successCheck, attempts, delay)` → bool
-
-### EasyWindow
-
-Window handling:
-
-* `Find(processName, partialTitle?)` / `FindAndFocus(...)` → IntPtr
-* `GetMainWindow(processName, partialTitle?)`, `FocusWindow(hWnd)`
-* `GetAllChildWindows(parent)` → List<IntPtr>
-
-### EasyOverlay, OverlayManager & OverlayConfiguration
-
-Create transparent overlays attached to target application windows, position them, and add UI controls with a fluent API.
-
-• EasyOverlay
-  - Creates a new overlay for a target window handle (`IntPtr`).
-  - Positions: TopLeft, TopRight, BottomLeft, BottomRight, Center.
-  - Transparent background support, borderless child window of the target.
-  - Auto-repositions on target window size/move changes.
-
-• OverlayManager
-  - `CreateOverlay(hWnd, configure?)` → EasyOverlay
-  - `CreateOverlayForWindow(processName, titleFilter, configure?)` → EasyOverlay?
-  - `CreateOverlaysForAllMatching(processName, titleFilter, configure?)` → int
-  - `StartWindowScan(processName, titleFilter, intervalMs, configure?)` → Timer
-  - `RemoveOverlay(hWnd)` / `RemoveAllOverlays()`
-
-• OverlayConfiguration (fluent API)
-  - `WithSize(width, height)`
-  - `WithPosition(OverlayPosition)` and `WithOffset(x, y)`
-  - `WithBackgroundColor(color)`
-  - `WithLabel(text, x, y, foreColor?, font?)`
-  - `WithButton(text, x, y, width, height, onClick, backColor?, foreColor?)`
-  - `WithAutoPosition(enabled, intervalMs)`
-  - `WithControl(control)` / `WithCustomization(action)`
-
-OverlayPosition enum: `TopLeft`, `TopRight`, `BottomLeft`, `BottomRight`, `Center`.
-
-**Quick start (attach one overlay to a found window):**
+### Scan for a byte pattern
 
 ```csharp
 using System;
 using System.Diagnostics;
-using System.Drawing;
-using NGMemory.Easy;
+using NGMemory;
 
-// Find a target window (example: main window of process "twe")
-IntPtr hwnd = NGMemory.Easy.EasyWindow.GetMainWindow("twe", ", Auftrag");
-if (hwnd != IntPtr.Zero)
-{
-   var mgr = new OverlayManager();
-   mgr.CreateOverlay(hwnd, overlay =>
-   {
-      overlay.Configure()
-         .WithSize(187, 70)
-         .WithPosition(OverlayPosition.BottomRight)
-         .WithOffset(5, 80)
-         .WithBackgroundColor(Color.Transparent)
-         .WithLabel("✔ Prüfung OK", 10, 5, Color.Green,
-            new Font("Segoe UI", 10, FontStyle.Bold))
-         .WithButton("Öffne Browser", 10, 30, 167, 30,
-            (s, e) => Process.Start(new ProcessStartInfo("https://example.com")
-            { UseShellExecute = true }),
-            Color.FromArgb(0, 122, 204), Color.White);
-   });
-}
+var process = Process.GetProcessesByName("notepad")[0];
+var scanner = new Scanner(process);
+IntPtr? address = scanner.ScanMemory("90 90 ?? 90");
 ```
 
-**Auto-scan and attach overlays to matching windows:**
+### Automate a window
+
+```csharp
+using NGMemory.Easy;
+
+IntPtr hwnd = EasyWindow.FindAndFocus("notepad");
+EasyKeyboard.TypeText("Automation started");
+```
+
+### Work with controls by dialog/control id
+
+```csharp
+using NGMemory.Easy;
+
+EasyTextBox.SetText(hwnd, 1001, "Hello");
+EasyButton.Click(hwnd, 1);
+bool isChecked = EasyCheckBox.IsChecked(hwnd, 2001);
+```
+
+### Create an overlay
 
 ```csharp
 using System;
 using System.Drawing;
 using NGMemory.Easy;
+using NGMemory.Overlay;
 
-var manager = new OverlayManager();
-// Scans every 1000 ms for windows of process "twe" whose title contains ", Auftrag"
-manager.StartWindowScan("twe", ", Auftrag", 1000, overlay =>
+IntPtr hwnd = EasyWindow.GetMainWindow("notepad");
+if (hwnd != IntPtr.Zero)
 {
-   overlay.Configure()
-      .WithSize(187, 70)
-      .WithPosition(OverlayPosition.BottomRight)
-      .WithOffset(5, 80)
-      .WithBackgroundColor(Color.Transparent)
-      .WithLabel("✔ Prüfung OK", 10, 5, Color.Green)
-      .WithButton("Öffne Browser", 10, 30, 167, 30,
-         (s, e) => System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("https://example.com")
-         { UseShellExecute = true }),
-         Color.FromArgb(0, 122, 204), Color.White);
-});
-```
-
-**Example inside a WinForms app (condensed):**
-
-```csharp
-public partial class Form1 : Form
-{
-   readonly OverlayManager overlayManager = new OverlayManager();
-
-   protected override void OnLoad(EventArgs e)
-   {
-      base.OnLoad(e);
-      overlayManager.StartWindowScan("twe", ", Auftrag", 1000, ConfigureOverlay);
-   }
-
-   private void ConfigureOverlay(EasyOverlay overlay)
-   {
-      overlay.Configure()
-         .WithSize(187, 70)
-         .WithPosition(OverlayPosition.BottomRight)
-         .WithOffset(5, 80)
-         .WithBackgroundColor(Color.Transparent)
-         .WithLabel("✔ Prüfung OK", 10, 5, Color.Green,
-            new Font("Segoe UI", 10, FontStyle.Bold))
-         .WithButton("Öffne Browser", 10, 30, 167, 30,
-            (s, e) => Process.Start(new ProcessStartInfo("https://example.com")
-            { UseShellExecute = true }),
-            Color.FromArgb(0, 122, 204), Color.White);
-   }
+    var manager = new OverlayManager();
+    manager.CreateOverlay(hwnd, overlay =>
+    {
+        overlay.Configure()
+            .WithSize(220, 80)
+            .WithPosition(OverlayPosition.BottomRight)
+            .WithOffset(12, 12)
+            .WithBackgroundColor(Color.Transparent)
+            .WithLabel("Overlay active", 10, 10, Color.LimeGreen)
+            .WithButton("Click", 10, 35, 90, 28, (s, e) => { });
+    });
 }
 ```
 
-## WinInteropTools
+## API Overview
 
-Low-level P/Invoke wrappers for GUI interop.
+### `NGMemory.Easy`
 
-### GuiInteropHandler
+High-level helper classes for common automation tasks.
 
-* `InteropSetText(dialog, id, text)`
-* `GetWindowTitle(hWnd)`
-* `getRef(hWnd, id)` → HandleRef
-* `EnumerateProcessWindowHandles(process)` → IEnumerable<IntPtr>
-* `getChildList(parent)` → List<IntPtr>
+- `EasyButton`: click a button by window handle and control id
+- `EasyCheckBox`: read, set, toggle, or click check boxes
+- `EasyComboBox`: read items and select entries
+- `EasyDebugHook`: wait for register values on hardware breakpoints
+- `EasyElementFinder`: find child controls by class name, text, or control id
+- `EasyFormHelper`: batch operations for text boxes, combo boxes, and check boxes
+- `EasyGuiInterop`: get window handles, child windows, titles, class names, and control handles
+- `EasyKeyboard`: type text and send common shortcuts
+- `EasyMemory`: process lookup, pattern search, and string reads
+- `EasyMouse`: move, click, double-click, and drag
+- `EasyOverlay`: overlay form attached to another window
+- `EasyPressKey`: low-level key pressing helpers based on scan codes
+- `EasyScreen`: capture screen, region, or window and search for a color
+- `EasyScreenAnalysis`: find all color matches, compare images, and search template images
+- `EasySysListView32`: read and interact with `SysListView32` controls
+- `EasyTextBox`: get, set, or clear text box content
+- `EasyWait`: polling and retry helpers
+- `EasyWindow`: find, focus, and inspect windows
 
-### CheckBox & ComboBox
+### `NGMemory.Overlay`
 
-* `CheckBox.IsCheckBoxChecked`, `SetCheckBoxState`
-* `ComboBox.GetSelectedItem`, `GetItems`, `SetSelectedItem`, `SetSelectedIndex`
+Overlay-specific components.
 
-### InputHelper
+- `OverlayManager`: create, track, remove, and auto-scan overlays for windows
+- `OverlayConfiguration`: fluent configuration for size, position, controls, colors, and callbacks
+- `OverlayStyleHelper`: Alt-Tab visibility helpers for overlay windows
+- `TargetWindowType`: filter matching windows by MDI, dialog, normal, or all windows
+- `OverlayPosition`: `TopLeft`, `TopRight`, `BottomLeft`, `BottomRight`, `Center`
 
-Keyboard/mouse via `SendInput`:
+### `NGMemory.WinInteropTools`
 
-* `PressKeys`, `PressKeysWithDelay`, `CopySelection`
-* `MouseMoveTo`, `MouseClick`, `MouseDown`, `MouseUp`
+Lower-level wrappers around Win32 messaging and control access.
 
-### MenuStripHelper
+- `GuiInteropHandler`: find dialog items, enumerate process windows, and inspect window titles/classes
+- `CheckBox`, `ComboBox`, `TextBox`: direct wrappers for common controls
+- `InputHelper`: keyboard and mouse input using `SendInput`
+- `MenuStripHelper`: click menu entries by index path
+- `SysListView32`: read list view items from other processes
+- `WindowStyleHelper`: parent/style/position helpers for windows
 
-Click menu items by path:
+### Core Types
 
-* `ClickMenu(hWnd, async, indices[] )`
+- `Scanner`: scans readable memory regions of a target process
+- `DebugHook`: attaches as debugger, sets a hardware breakpoint, and returns register values
+- `Module`: reads a module base address from a process
+- `VAMemory`: typed memory read/write convenience wrapper
+- `Constants`, `Enums`, `Structures`, `Kernel32`, `User32`, `MessageHelper`: Win32 interop definitions and helper methods
 
-### SysListView32
+## Notes
 
-Read ListView items in another process:
-
-* `GetListViewItems`, `ReadListViewItem`
-
-### TextBox
-
-Get value of TextBox control:
-
-* `getTextBoxValue(window, controlId)` → string
-
-## Core Library (NGMemory)
-
-### Constants, Enums, Structures
-
-Windows API constants, register and MessageBox enums,
-`DEBUG_EVENT`, `CONTEXT`, `MEMORY_BASIC_INFORMATION`, `SYSTEM_INFO`.
-
-### User32, Kernel32 & MessageHelper
-
-All P/Invoke signatures and `ShowMessage` helper.
-
-### DebugHook
-
-Attach to process, set hardware breakpoint, wait for single-step exception, read register.
-
-### Scanner
-
-Scan process memory regions with `VirtualQueryEx`, search byte patterns with wildcards.
-
-### Module
-
-Get base address of a module by name in a process.
-
-### VAMemory
-
-General-purpose read/write of any type:
-`ReadByteArray`, `ReadStringUnicode/ASCII`, `ReadInt32`, ..., `WriteXxx` methods.
-
-**Example:**
-
-```csharp
-var mem = new VAMemory("game");
-if(mem.CheckProcess()){
-    int health = mem.ReadInt32(addr);
-    mem.WriteInt32(addr, 999);
-}
-```
-
-## Examples
-
-```csharp
-// Automate Notepad:
-var hwnd = EasyWindow.Find("notepad");
-EasyWindow.FocusWindow(hwnd);
-EasyKeyboard.TypeText("Automation started...\n");
-EasyButton.Click(hwnd, 1);
-```
+- This library targets classic Windows desktop applications. It is not intended for browser automation or modern UI frameworks that do not expose standard Win32 controls.
+- Memory scanning, writing, and debugging may require elevated permissions depending on the target process.
+- Overlay functionality depends on a message loop, so it is primarily intended for WinForms-style applications.
+- Some helper methods interact with controls by sending messages directly; behavior can vary if a target application uses owner-drawn or custom controls.
 
 ## License
 

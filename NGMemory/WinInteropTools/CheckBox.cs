@@ -17,14 +17,25 @@ namespace NGMemory.WinInteropTools
     {
         public static bool IsCheckBoxChecked(IntPtr Pointer, int Steuerelement)
         {
-            IntPtr result = SendMessage(getRef(Pointer, Steuerelement), BM_GETCHECK, IntPtr.Zero, new StringBuilder());
-            return result.ToInt32() == 1;
+            IntPtr handle = getRef(Pointer, Steuerelement).Handle;
+            if (global::System.Windows.Forms.Control.FromHandle(handle) is global::System.Windows.Forms.CheckBox checkBox)
+                return checkBox.Checked;
+
+            IntPtr result = SendMessage(handle, BM_GETCHECK, IntPtr.Zero, IntPtr.Zero);
+            return result.ToInt32() == BST_CHECKED;
         }
 
         public static void SetCheckBoxState(IntPtr Pointer, int Steuerelement, bool isChecked)
         {
             int state = isChecked ? BST_CHECKED : BST_UNCHECKED;
-            SendMessage(getRef(Pointer, Steuerelement), BM_SETCHECK, (IntPtr)state, "");
+            IntPtr handle = getRef(Pointer, Steuerelement).Handle;
+            if (global::System.Windows.Forms.Control.FromHandle(handle) is global::System.Windows.Forms.CheckBox checkBox)
+            {
+                checkBox.Checked = isChecked;
+                return;
+            }
+
+            SendMessage(handle, BM_SETCHECK, (IntPtr)state, IntPtr.Zero);
         }
 
     }

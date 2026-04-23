@@ -38,6 +38,7 @@ namespace NGMemory.Easy
         private const int LVM_DELETEITEM = LVM_FIRST + 8;    // 0x1008
         private const int LVM_INSERTITEM = LVM_FIRST + 7;    // 0x1007
         private const int LVM_SETITEM = LVM_FIRST + 6;    // 0x1006
+        private const int LVM_SETITEMTEXTW = LVM_FIRST + 116; // 0x1074
         private const int LVM_GETHEADER = LVM_FIRST + 31;   // 0x101F
         private const int LVM_GETITEMCOUNT = LVM_FIRST + 4;    // 0x1004
         private const int LVM_GETITEMTEXTW = LVM_FIRST + 115;  // 0x1073 (Unicode)
@@ -180,23 +181,32 @@ namespace NGMemory.Easy
 
         public static IntPtr SearchSysListView32InWindow(IntPtr listViewWindowHandle)
         {
-            IntPtr child = IntPtr.Zero;
+            if (listViewWindowHandle == IntPtr.Zero)
+                return IntPtr.Zero;
 
-            for (int i = 0; i < 50; i++)
+            if (IsSysListView32(listViewWindowHandle))
+                return listViewWindowHandle;
+
+            IntPtr found = IntPtr.Zero;
+            NGMemory.User32.EnumChildWindows(listViewWindowHandle, (child, lParam) =>
             {
-                child = NGMemory.User32.FindWindowEx(listViewWindowHandle, child, null, null);
-                if (child == IntPtr.Zero) break;
-
-                StringBuilder sb = new StringBuilder(256);
-                NGMemory.User32.GetClassName(child, sb, sb.Capacity);
-
-                if (sb.ToString() == "SysListView32")
+                if (IsSysListView32(child))
                 {
-                    return child;
+                    found = child;
+                    return false;
                 }
-            }
 
-            return child;
+                return true;
+            }, IntPtr.Zero);
+
+            return found;
+        }
+
+        private static bool IsSysListView32(IntPtr handle)
+        {
+            StringBuilder sb = new StringBuilder(256);
+            NGMemory.User32.GetClassName(handle, sb, sb.Capacity);
+            return sb.ToString().IndexOf("SysListView32", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         public static int GetListViewItemByName(IntPtr listViewHandle, string ContainsName)
@@ -228,7 +238,7 @@ namespace NGMemory.Easy
 
             IntPtr pLvItem = Marshal.AllocHGlobal(Marshal.SizeOf(lvItem));
             Marshal.StructureToPtr(lvItem, pLvItem, false);
-            NGMemory.User32.SendMessage(listViewHandle, LVM_SETITEM, IntPtr.Zero, pLvItem);
+            NGMemory.User32.SendMessage(listViewHandle, LVM_SETITEMTEXTW, (IntPtr)itemIndex, pLvItem);
             Marshal.FreeHGlobal(lvItem.pszText);
             Marshal.FreeHGlobal(pLvItem);
         }

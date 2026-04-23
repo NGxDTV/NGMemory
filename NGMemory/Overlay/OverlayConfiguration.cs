@@ -1,8 +1,9 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using NGMemory.Easy;
 
-namespace NGMemory.Easy
+namespace NGMemory.Overlay
 {
     /// <summary>
     /// Provides a fluent API for configuring overlays.

@@ -20,9 +20,7 @@ namespace NGMemory.WinInteropTools
     {
         public static void InteropSetText(IntPtr iptrHWndDialog, int iControlID, string strTextToSet)
         {
-            IntPtr iptrHWndControl = GetDlgItem(iptrHWndDialog, iControlID);
-            HandleRef hrefHWndTarget = new HandleRef(null, iptrHWndControl);
-            SendMessage(hrefHWndTarget, WM_SETTEXT, IntPtr.Zero, new StringBuilder(strTextToSet));
+            SendMessage(getRef(iptrHWndDialog, iControlID), WM_SETTEXT, IntPtr.Zero, new StringBuilder(strTextToSet));
         }
 
         public static string GetWindowTitle(IntPtr hWnd)
@@ -48,14 +46,22 @@ namespace NGMemory.WinInteropTools
 
         public static IntPtr GetWindowByClassName(IntPtr window, string className)
         {
-            for (int i = 0; i < 100; i++)
-            {
-                var sb = new StringBuilder(256);
-                GetClassName(window, sb, sb.Capacity);
+            if (window == IntPtr.Zero || string.IsNullOrWhiteSpace(className))
+                return IntPtr.Zero;
 
-                if (sb.ToString() == className)
-                    return window;
+            var currentClass = new StringBuilder(256);
+            GetClassName(window, currentClass, currentClass.Capacity);
+            if (string.Equals(currentClass.ToString(), className, StringComparison.Ordinal))
+                return window;
+
+            IntPtr child = IntPtr.Zero;
+            while ((child = FindWindowEx(window, child, null, null)) != IntPtr.Zero)
+            {
+                IntPtr match = GetWindowByClassName(child, className);
+                if (match != IntPtr.Zero)
+                    return match;
             }
+
             return IntPtr.Zero;
         }
 
@@ -72,9 +78,35 @@ namespace NGMemory.WinInteropTools
         public static HandleRef getRef(IntPtr hWnd, int controlid)
         {
             IntPtr iptrHWndControl = GetDlgItem(hWnd, controlid);
+            if (iptrHWndControl == IntPtr.Zero)
+                iptrHWndControl = FindChildByControlId(hWnd, controlid);
+
             HandleRef hrefHWndTarget = new HandleRef(null, iptrHWndControl);
 
             return hrefHWndTarget;
+        }
+
+        public static IntPtr FindChildByControlId(IntPtr parent, int controlId)
+        {
+            if (parent == IntPtr.Zero)
+                return IntPtr.Zero;
+
+            if (GetDlgCtrlID(parent) == controlId)
+                return parent;
+
+            IntPtr found = IntPtr.Zero;
+            EnumChildWindows(parent, (child, lParam) =>
+            {
+                if (GetDlgCtrlID(child) == controlId)
+                {
+                    found = child;
+                    return false;
+                }
+
+                return true;
+            }, IntPtr.Zero);
+
+            return found;
         }
 
         public static IntPtr getList(IEnumerable<IntPtr> es, string titel)

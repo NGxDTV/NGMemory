@@ -195,7 +195,7 @@ namespace NGMemory
 
             try
             {
-                return BitConverter.ToChar(ReadByteArray(pOffset, 1u), 0);
+                return BitConverter.ToChar(ReadByteArray(pOffset, 2u), 0);
             }
             catch (Exception ex)
             {
