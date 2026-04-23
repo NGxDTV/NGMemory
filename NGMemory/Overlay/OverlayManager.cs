@@ -253,11 +253,16 @@ namespace NGMemory.Overlay
         /// </summary>
         public void RemoveAllOverlays()
         {
-            foreach (var overlay in overlays)
+            var snapshot = overlays.ToArray();
+            overlays.Clear();
+
+            foreach (var overlay in snapshot)
             {
+                if (overlay == null || overlay.IsDisposed)
+                    continue;
+
                 overlay.Close();
             }
-            overlays.Clear();
         }
 
         /// <summary>

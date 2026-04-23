@@ -17,14 +17,16 @@ namespace NGMemory.WinInteropTools
     {
         public static bool IsCheckBoxChecked(IntPtr Pointer, int Steuerelement)
         {
-            IntPtr result = SendMessage(getRef(Pointer, Steuerelement), BM_GETCHECK, IntPtr.Zero, new StringBuilder());
+            IntPtr handle = getRef(Pointer, Steuerelement).Handle;
+            IntPtr result = SendMessage(handle, BM_GETCHECK, IntPtr.Zero, IntPtr.Zero);
             return result.ToInt32() == 1;
         }
 
         public static void SetCheckBoxState(IntPtr Pointer, int Steuerelement, bool isChecked)
         {
             int state = isChecked ? BST_CHECKED : BST_UNCHECKED;
-            SendMessage(getRef(Pointer, Steuerelement), BM_SETCHECK, (IntPtr)state, "");
+            IntPtr handle = getRef(Pointer, Steuerelement).Handle;
+            SendMessage(handle, BM_SETCHECK, (IntPtr)state, IntPtr.Zero);
         }
 
     }
