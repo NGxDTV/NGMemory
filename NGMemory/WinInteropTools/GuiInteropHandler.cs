@@ -48,14 +48,22 @@ namespace NGMemory.WinInteropTools
 
         public static IntPtr GetWindowByClassName(IntPtr window, string className)
         {
-            for (int i = 0; i < 100; i++)
-            {
-                var sb = new StringBuilder(256);
-                GetClassName(window, sb, sb.Capacity);
+            if (window == IntPtr.Zero || string.IsNullOrWhiteSpace(className))
+                return IntPtr.Zero;
 
-                if (sb.ToString() == className)
-                    return window;
+            var currentClass = new StringBuilder(256);
+            GetClassName(window, currentClass, currentClass.Capacity);
+            if (string.Equals(currentClass.ToString(), className, StringComparison.Ordinal))
+                return window;
+
+            IntPtr child = IntPtr.Zero;
+            while ((child = FindWindowEx(window, child, null, null)) != IntPtr.Zero)
+            {
+                IntPtr match = GetWindowByClassName(child, className);
+                if (match != IntPtr.Zero)
+                    return match;
             }
+
             return IntPtr.Zero;
         }
 

@@ -12,6 +12,7 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,7 +32,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PreferNativeArm64>false</PreferNativeArm64>
-    <GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
@@ -51,10 +52,10 @@
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x64</PlatformTarget>
-    <GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
-    <PreferNativeArm64>true</PreferNativeArm64>
+    <PreferNativeArm64>false</PreferNativeArm64>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -69,18 +70,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="C:/Users/m.kriebel/Documents/GitHub/NGMemory/NGMemory/Easy/\EasyOverlay.cs">
-      <Link>EasyOverlay.cs</Link>
-    </Compile>
-    <Compile Include="C:/Users/m.kriebel/Documents/GitHub/NGMemory/NGMemory/Overlay/\OverlayConfiguration.cs">
-      <Link>OverlayConfiguration.cs</Link>
-    </Compile>
-    <Compile Include="C:/Users/m.kriebel/Documents/GitHub/NGMemory/NGMemory/Overlay/\OverlayManager.cs">
-      <Link>OverlayManager.cs</Link>
-    </Compile>
-    <Compile Include="C:/Users/m.kriebel/Documents/GitHub/NGMemory/NGMemory/WinInteropTools/\WindowStyleHelper.cs">
-      <Link>WindowStyleHelper.cs</Link>
-    </Compile>
     <Compile Include="Easy\EasyButton.cs" />
     <Compile Include="Easy\EasyCheckBox.cs" />
     <Compile Include="Easy\EasyComboBox.cs" />

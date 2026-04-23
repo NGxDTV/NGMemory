@@ -30,6 +30,8 @@ namespace NGMemory.Easy
                 
                 var process = processes[0];
                 byte[] patternBytes = ParsePattern(pattern, out byte[] mask);
+                if (patternBytes.Length == 0)
+                    return IntPtr.Zero;
                 
                 // Standard-Suchbereich falls nicht angegeben
                 if (startAddress == IntPtr.Zero) startAddress = process.MainModule.BaseAddress;
@@ -37,6 +39,7 @@ namespace NGMemory.Easy
                 
                 // Speicher in Blöcken scannen
                 int blockSize = 4096;
+                int overlap = Math.Max(0, patternBytes.Length - 1);
                 long currentAddress = startAddress.ToInt64();
                 
                 while (currentAddress < endAddress.ToInt64())
@@ -77,7 +80,14 @@ namespace NGMemory.Easy
                         }
                     }
                     
-                    currentAddress += bytesReadPtr.ToInt32();
+                    int bytesReadCount = bytesReadPtr.ToInt32();
+                    if (bytesReadCount <= 0)
+                    {
+                        currentAddress += blockSize;
+                        continue;
+                    }
+
+                    currentAddress += Math.Max(1, bytesReadCount - overlap);
                 }
             }
             catch
@@ -122,7 +132,8 @@ namespace NGMemory.Easy
         
         private static byte[] ParsePattern(string pattern, out byte[] mask)
         {
-            string[] parts = pattern.Split(' ');
+            string[] parts = pattern
+                .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             byte[] result = new byte[parts.Length];
             mask = new byte[parts.Length];
             

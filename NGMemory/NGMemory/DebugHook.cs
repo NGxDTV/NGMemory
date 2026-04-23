@@ -17,12 +17,6 @@ namespace NGMemory
 {
     public class DebugHook
     {
-        private static bool keepDebugging = true;
-        private static bool detachRequested = false;
-        private static IntPtr hProcess = IntPtr.Zero;
-        private static byte[] originalByte = new byte[1];
-
-
         /// <summary>
         /// Retrieves the value of a specified CPU register from the given thread context.
         /// Maps the register enumeration to the corresponding field in the CONTEXT structure.

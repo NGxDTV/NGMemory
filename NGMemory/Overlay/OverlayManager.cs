@@ -25,7 +25,7 @@ namespace NGMemory.Overlay
     /// </summary>
     public class OverlayManager
     {
-        private List<EasyOverlay> overlays = new List<EasyOverlay>();
+        private readonly List<EasyOverlay> overlays = new List<EasyOverlay>();
 
         /// <summary>
         /// Gets all active overlays.
@@ -45,8 +45,15 @@ namespace NGMemory.Overlay
                 return null;
 
             // Check if overlay already exists
-            foreach (var existing in overlays)
+            for (int i = overlays.Count - 1; i >= 0; i--)
             {
+                var existing = overlays[i];
+                if (existing == null || existing.IsDisposed)
+                {
+                    overlays.RemoveAt(i);
+                    continue;
+                }
+
                 if (existing.TargetWindow == targetWindow)
                     return existing;
             }
@@ -59,6 +66,7 @@ namespace NGMemory.Overlay
             
             // Add to managed collection
             overlays.Add(overlay);
+            overlay.FormClosed += (s, e) => overlays.Remove(overlay);
             
             // Show the overlay
             overlay.Show();
@@ -131,7 +139,7 @@ namespace NGMemory.Overlay
                             {
                                 if (windowType == TargetWindowType.MDIClient || windowType == TargetWindowType.All)
                                 {
-                                    if (CreateOverlay(childHwnd, configure) != null)
+                                    if (CreateOverlayIfMissing(childHwnd, configure))
                                         count++;
                                 }
                                 else if (windowType == TargetWindowType.DialogWindows)
@@ -142,7 +150,7 @@ namespace NGMemory.Overlay
                                         string className = classNameBuf.ToString();
                                         if (className == "#32770") // standard dialog class
                                         {
-                                            if (CreateOverlay(childHwnd, configure) != null)
+                                            if (CreateOverlayIfMissing(childHwnd, configure))
                                                 count++;
                                         }
                                     }
@@ -187,14 +195,14 @@ namespace NGMemory.Overlay
                     // Decide based on windowType
                     if (windowType == TargetWindowType.All)
                     {
-                        if (CreateOverlay(hWnd, configure) != null)
+                        if (CreateOverlayIfMissing(hWnd, configure))
                             count++;
                     }
                     else if (windowType == TargetWindowType.DialogWindows)
                     {
                         if (className == "#32770")
                         {
-                            if (CreateOverlay(hWnd, configure) != null)
+                            if (CreateOverlayIfMissing(hWnd, configure))
                                 count++;
                         }
                     }
@@ -203,7 +211,7 @@ namespace NGMemory.Overlay
                         // Treat normal as top-level windows that are not dialogs
                         if (className != "#32770")
                         {
-                            if (CreateOverlay(hWnd, configure) != null)
+                            if (CreateOverlayIfMissing(hWnd, configure))
                                 count++;
                         }
                     }
@@ -212,7 +220,7 @@ namespace NGMemory.Overlay
                         // If user explicitly asked for MDIClient but process has top-level windows, handle main window here
                         if (hWnd == mainWindow && mainWindow != IntPtr.Zero)
                         {
-                            if (CreateOverlay(mainWindow, configure) != null)
+                            if (CreateOverlayIfMissing(mainWindow, configure))
                                 count++;
                         }
                     }
@@ -268,10 +276,17 @@ namespace NGMemory.Overlay
             Action<EasyOverlay> configure = null,
             TargetWindowType windowType = TargetWindowType.MDIClient)
         {
+            CreateOverlaysForAllMatching(processName, windowTitleFilter, configure, windowType);
             var timer = new System.Windows.Forms.Timer { Interval = interval };
             timer.Tick += (s, e) => CreateOverlaysForAllMatching(processName, windowTitleFilter, configure, windowType);
             timer.Start();
             return timer;
+        }
+
+        private bool CreateOverlayIfMissing(IntPtr targetWindow, Action<EasyOverlay> configure)
+        {
+            int before = overlays.Count;
+            return CreateOverlay(targetWindow, configure) != null && overlays.Count > before;
         }
     }
 }

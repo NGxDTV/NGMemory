@@ -18,22 +18,29 @@ namespace NGMemory.Easy
             Process[] procs = Process.GetProcessesByName(processName);
             if (procs.Length == 0) return IntPtr.Zero;
 
-            // Nimmt den ersten Prozess
-            IntPtr mainHandle = procs[0].MainWindowHandle;
-            // Prüfen, ob partialTitle vorhanden
             if (!string.IsNullOrEmpty(partialTitle))
             {
-                // Sucht passendes Fenster per Titel
-                var handles = WinInteropTools.GuiInteropHandler.EnumerateProcessWindowHandles(procs[0]);
-                foreach (var hWnd in handles)
+                foreach (var proc in procs)
                 {
-                    string title = WinInteropTools.GuiInteropHandler.GetWindowTitle(hWnd);
-                    if (title.Contains(partialTitle))
-                        return hWnd;
+                    var handles = WinInteropTools.GuiInteropHandler.EnumerateProcessWindowHandles(proc);
+                    foreach (var hWnd in handles)
+                    {
+                        string title = WinInteropTools.GuiInteropHandler.GetWindowTitle(hWnd);
+                        if (title.Contains(partialTitle))
+                            return hWnd;
+                    }
                 }
+
                 return IntPtr.Zero;
             }
-            return mainHandle;
+
+            foreach (var proc in procs)
+            {
+                if (proc.MainWindowHandle != IntPtr.Zero)
+                    return proc.MainWindowHandle;
+            }
+
+            return IntPtr.Zero;
         }
 
         /// <summary>

@@ -108,6 +108,7 @@ namespace NGMemory.WinInteropTools
 
         public static void MouseMoveTo(int x, int y)
         {
+            var bounds = System.Windows.Forms.Screen.PrimaryScreen.Bounds;
             INPUT input = new INPUT
             {
                 type = INPUT_MOUSE,
@@ -115,8 +116,8 @@ namespace NGMemory.WinInteropTools
                 {
                     mi = new MOUSEINPUT
                     {
-                        dx = x * (65535 / System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width),
-                        dy = y * (65535 / System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height),
+                        dx = bounds.Width > 1 ? (int)Math.Round((double)x * 65535 / (bounds.Width - 1)) : 0,
+                        dy = bounds.Height > 1 ? (int)Math.Round((double)y * 65535 / (bounds.Height - 1)) : 0,
                         dwFlags = MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE
                     }
                 }
