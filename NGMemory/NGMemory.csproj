@@ -90,6 +90,7 @@
     <Compile Include="Easy\EasySysListView32.cs" />
     <Compile Include="Easy\EasyTextBox.cs" />
     <Compile Include="Easy\EasyWait.cs" />
+    <Compile Include="Easy\WindowCaptureProtection.cs" />
     <Compile Include="Easy\EasyWindow.cs" />
     <Compile Include="Overlay\OverlayConfiguration.cs" />
     <Compile Include="Overlay\OverlayManager.cs" />

@@ -122,5 +122,13 @@ namespace NGMemory
 
         [DllImport("user32.dll", SetLastError = true)]
         public static extern bool GetWindowRect(IntPtr hwnd, out RECT lpRect);
+
+        /// <summary>
+        /// Sets the display affinity for a top-level window. This can be used to
+        /// hide a window from screen capture on supported Windows versions.
+        /// </summary>
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool SetWindowDisplayAffinity(IntPtr hWnd, uint dwAffinity);
     }
 }

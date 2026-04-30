@@ -10,6 +10,7 @@ NGMemory is a Windows-only .NET Framework library for external process memory ac
 - Automate classic Win32 controls such as buttons, text boxes, combo boxes, check boxes, and list views
 - Simulate keyboard and mouse input
 - Capture screenshots, search colors, and compare images
+- Apply Windows screen-capture protection to top-level windows
 - Attach transparent overlay forms to target windows
 
 ## Requirements
@@ -86,6 +87,20 @@ IntPtr hwnd = EasyWindow.FindAndFocus("notepad");
 EasyKeyboard.TypeText("Automation started");
 ```
 
+### Protect a window from screen capture
+
+```csharp
+using NGMemory.Easy;
+
+var result = EasyWindow.SetCaptureProtection(hwnd, true);
+if (!result.ReturnValue)
+{
+    Console.WriteLine("SetWindowDisplayAffinity failed: " + result.Win32Error);
+}
+```
+
+`SetWindowDisplayAffinity` only works for top-level windows owned by the current process. Normal controls cannot be protected individually; use separate borderless top-level overlay windows for selected protected regions. `WDA_EXCLUDEFROMCAPTURE` is correctly supported starting with Windows 10 version 2004.
+
 ### Work with controls by dialog/control id
 
 ```csharp
@@ -144,7 +159,7 @@ High-level helper classes for common automation tasks.
 - `EasySysListView32`: read and interact with `SysListView32` controls
 - `EasyTextBox`: get, set, or clear text box content
 - `EasyWait`: polling and retry helpers
-- `EasyWindow`: find, focus, and inspect windows
+- `EasyWindow`: find, focus, inspect windows, and apply screen-capture protection
 
 ### `NGMemory.Overlay`
 

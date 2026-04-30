@@ -95,5 +95,34 @@ namespace NGMemory.Easy
             IntPtr hWnd = GetMainWindow(processName, partialTitle);
             return hWnd;
         }
+
+        /// <summary>
+        /// Aktiviert oder deaktiviert Windows Screen-Capture-Schutz fuer ein
+        /// Top-Level-Fenster. Einzelne normale Controls koennen damit nicht
+        /// geschuetzt werden; dafuer sind separate Top-Level-Overlay-Fenster noetig.
+        /// </summary>
+        public static WindowCaptureProtectionResult SetCaptureProtection(IntPtr windowHandle, bool protect)
+        {
+            return WindowCaptureProtection.SetProtection(windowHandle, protect);
+        }
+
+        /// <summary>
+        /// Setzt eine konkrete Window-Display-Affinity auf einem Top-Level-Fenster.
+        /// WDA_EXCLUDEFROMCAPTURE wird ab Windows 10 Version 2004 korrekt unterstuetzt.
+        /// </summary>
+        public static WindowCaptureProtectionResult SetDisplayAffinity(
+            IntPtr windowHandle,
+            WindowDisplayAffinity affinity)
+        {
+            return WindowCaptureProtection.SetAffinity(windowHandle, affinity);
+        }
+
+        /// <summary>
+        /// Entfernt den Windows Screen-Capture-Schutz von einem Top-Level-Fenster.
+        /// </summary>
+        public static WindowCaptureProtectionResult ClearCaptureProtection(IntPtr windowHandle)
+        {
+            return WindowCaptureProtection.Clear(windowHandle);
+        }
     }
 }
