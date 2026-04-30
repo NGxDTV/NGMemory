@@ -101,6 +101,18 @@ if (!result.ReturnValue)
 
 `SetWindowDisplayAffinity` only works for top-level windows owned by the current process. Normal controls cannot be protected individually; use separate borderless top-level overlay windows for selected protected regions. `WDA_EXCLUDEFROMCAPTURE` is correctly supported starting with Windows 10 version 2004.
 
+### Reusable protected area UI
+
+```csharp
+using NGMemory.CaptureProtection;
+
+var maskControl = new CaptureMaskControl();
+maskControl.BindToOwner(this);
+controlsPanel.Controls.Add(maskControl);
+```
+
+`CaptureMaskControl` is a designer-editable WinForms control. It creates a movable top-level protected area, supports click-through border mode, `WDA_MONITOR` black capture masking, and visible demo modes for placeholder text or simulated blur. Placeholder and blur are intentionally visible demo modes because screenshot-only text/blur for arbitrary foreign windows is not provided by normal Win32 APIs.
+
 ### Work with controls by dialog/control id
 
 ```csharp
@@ -170,6 +182,14 @@ Overlay-specific components.
 - `OverlayStyleHelper`: Alt-Tab visibility helpers for overlay windows
 - `TargetWindowType`: filter matching windows by MDI, dialog, normal, or all windows
 - `OverlayPosition`: `TopLeft`, `TopRight`, `BottomLeft`, `BottomRight`, `Center`
+
+### `NGMemory.CaptureProtection`
+
+- `CaptureMaskControl`: designer-editable WinForms UI for a protected area
+- `ProtectedAreaManager`: create, move, resize, bind, and remove a protected area
+- `ProtectedAreaWindow`: borderless draggable top-level protected area window
+- `CaptureMaskViewModel`: reusable state object for position, size, visual mode, and affinity result
+- `CaptureMaskProtectionHelper`: applies the right display affinity for mask modes
 
 ### `NGMemory.WinInteropTools`
 

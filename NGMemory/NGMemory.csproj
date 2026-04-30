@@ -70,6 +70,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CaptureProtection\CaptureMaskControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CaptureProtection\CaptureMaskControl.Designer.cs">
+      <DependentUpon>CaptureMaskControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CaptureProtection\CaptureMaskEffect.cs" />
+    <Compile Include="CaptureProtection\CaptureMaskProtectionHelper.cs" />
+    <Compile Include="CaptureProtection\CaptureMaskViewModel.cs" />
+    <Compile Include="CaptureProtection\ProtectedAreaManager.cs" />
+    <Compile Include="CaptureProtection\ProtectedAreaWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Easy\EasyButton.cs" />
     <Compile Include="Easy\EasyCheckBox.cs" />
     <Compile Include="Easy\EasyComboBox.cs" />
