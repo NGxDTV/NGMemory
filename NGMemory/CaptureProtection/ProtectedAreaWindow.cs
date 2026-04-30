@@ -33,6 +33,14 @@ namespace NGMemory.CaptureProtection
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.Manual;
             DoubleBuffered = true;
+            ResizeRedraw = true;
+            SetStyle(
+                ControlStyles.UserPaint |
+                ControlStyles.AllPaintingInWmPaint |
+                ControlStyles.OptimizedDoubleBuffer |
+                ControlStyles.ResizeRedraw,
+                true);
+            UpdateStyles();
             MinimumSize = new Size(80, 60);
             Font = new Font("Segoe UI", 9F, FontStyle.Bold);
         }
@@ -140,7 +148,7 @@ namespace NGMemory.CaptureProtection
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            base.OnPaint(e);
+            e.Graphics.Clear(BackColor);
             e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
             if (!BorderOnlyForUser)
@@ -173,6 +181,17 @@ namespace NGMemory.CaptureProtection
             {
                 PaintCrosshairAndGrips(e.Graphics);
             }
+        }
+
+        protected override void OnPaintBackground(PaintEventArgs e)
+        {
+            e.Graphics.Clear(BackColor);
+        }
+
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            Invalidate();
         }
 
         private double CalculateWindowOpacity(CaptureMaskViewModel model)
