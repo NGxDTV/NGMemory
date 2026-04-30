@@ -53,6 +53,8 @@ using NGMemory.WinInteropTools;
 
 ## Quick Start
 
+Full documentation with focused examples is available in [`docs/index.md`](docs/index.md).
+
 ### Read and write memory
 
 ```csharp
