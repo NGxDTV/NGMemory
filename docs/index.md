@@ -31,6 +31,7 @@ using NGMemory.WinInteropTools;
 - [Screen Analysis](screen-analysis.md): screenshots, color/image matching
 - [Troubleshooting](troubleshooting.md): common errors, permissions, DPI, capture caveats
 - [API Reference](api-reference.md): compact method/class map
+- [Release 1.0.8](release-1.0.8.md): release notes for the capture-protection update
 
 ## Minimal Sanity Test
 

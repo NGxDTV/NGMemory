@@ -22,16 +22,17 @@ NGMemory is a Windows-only .NET Framework library for external process memory ac
 
 ## Installation
 
-### NuGet
-
-```powershell
-Install-Package NGMemory -Version 1.0.7
-```
-
 ### Source
 
 ```powershell
 dotnet build NGMemory.sln
+```
+
+Reference the generated DLL from:
+
+```text
+NGMemory\bin\Debug\NGMemory.dll
+NGMemory\bin\Release\NGMemory.dll
 ```
 
 ## Namespaces

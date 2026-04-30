@@ -2,12 +2,6 @@
 
 ## Add NGMemory To A Project
 
-### From NuGet
-
-```powershell
-Install-Package NGMemory -Version 1.0.7
-```
-
 ### From Source
 
 ```powershell
@@ -22,6 +16,8 @@ Reference the generated DLL from:
 NGMemory\bin\Debug\NGMemory.dll
 NGMemory\bin\Release\NGMemory.dll
 ```
+
+NGMemory is currently distributed as source code or direct DLL reference.
 
 ## Recommended Test Project
 
@@ -137,4 +133,3 @@ Expected result:
 - A designer-editable control appears.
 - Click `Maske erstellen`.
 - Use `Schwarz` mode for black capture masking.
-
