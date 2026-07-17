@@ -78,6 +78,9 @@
       <DependentUpon>CaptureMaskControl.cs</DependentUpon>
     </Compile>
     <Compile Include="CaptureProtection\CaptureMaskEffect.cs" />
+    <Compile Include="CaptureProtection\ImageBlur.cs" />
+    <Compile Include="CaptureProtection\ScreenshotBlurProtector.cs" />
+    <Compile Include="CaptureProtection\CaptureBlackoutProtector.cs" />
     <Compile Include="CaptureProtection\CaptureMaskProtectionHelper.cs" />
     <Compile Include="CaptureProtection\CaptureMaskViewModel.cs" />
     <Compile Include="CaptureProtection\ProtectedAreaManager.cs" />
