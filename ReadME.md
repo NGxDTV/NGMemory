@@ -12,6 +12,7 @@ NGMemory is a Windows-only .NET Framework library for external process memory ac
 - Capture screenshots, search colors, and compare images
 - Apply Windows screen-capture protection to top-level windows
 - Attach transparent overlay forms to target windows
+- Wait for conditions, windows, controls, processes, signals, and action results with timeout and cancellation
 
 ## Requirements
 
@@ -40,6 +41,7 @@ NGMemory\bin\Release\NGMemory.dll
 ```csharp
 using NGMemory;
 using NGMemory.Easy;
+using NGMemory.Waiting;
 using NGMemory.Overlay;
 using NGMemory.WinInteropTools;
 ```
@@ -50,6 +52,7 @@ using NGMemory.WinInteropTools;
 - `NGMemory/VAMemory`: generic typed memory read/write wrapper
 - `NGMemory/WinInteropTools`: low-level control and window interop helpers
 - `NGMemory/Easy`: higher-level convenience API
+- `NGMemory/Waiting`: detailed synchronous/asynchronous waiting and action workflows
 - `NGMemory/Overlay`: overlay manager, configuration, and style helpers
 
 ## Quick Start
@@ -89,6 +92,23 @@ using NGMemory.Easy;
 IntPtr hwnd = EasyWindow.FindAndFocus("notepad");
 EasyKeyboard.TypeText("Automation started");
 ```
+
+### Wait for a window or action result
+
+```csharp
+using NGMemory.Easy;
+
+IntPtr hwnd = EasyWait.ForWindow("notepad", timeout: 10000);
+if (hwnd != IntPtr.Zero)
+{
+    bool completed = EasyWait.DoAndWait(
+        () => EasyButton.Click(hwnd, 1),
+        () => EasyTextBox.GetText(hwnd, 1001) == "Saved",
+        timeout: 3000);
+}
+```
+
+Use `NGMemory.Waiting.Waiter` when you need a detailed result with timeout, cancellation, elapsed time, attempts, and the last error. Complete examples are in [`docs/waiting.md`](docs/waiting.md).
 
 ### Protect a window from screen capture
 
@@ -173,7 +193,7 @@ High-level helper classes for common automation tasks.
 - `EasyScreenAnalysis`: find all color matches, compare images, and search template images
 - `EasySysListView32`: read and interact with `SysListView32` controls
 - `EasyTextBox`: get, set, or clear text box content
-- `EasyWait`: polling and retry helpers
+- `EasyWait`: conditions, windows, controls, processes, signals, actions, async waits, and retries
 - `EasyWindow`: find, focus, inspect windows, and apply screen-capture protection
 
 ### `NGMemory.Overlay`
@@ -212,6 +232,13 @@ Lower-level wrappers around Win32 messaging and control access.
 - `Module`: reads a module base address from a process
 - `VAMemory`: typed memory read/write convenience wrapper
 - `Constants`, `Enums`, `Structures`, `Kernel32`, `User32`, `MessageHelper`: Win32 interop definitions and helper methods
+
+### `NGMemory.Waiting`
+
+- `Waiter`: cancellable polling, Windows/process/signal waits, action completion, and retries
+- `WaitOptions`: timeout, poll interval, and transient error behavior
+- `WaitResult` / `WaitResult<T>`: structured outcome and diagnostics
+- `WindowQuery`: precise process, title, state, and custom window matching
 
 ## Notes
 
