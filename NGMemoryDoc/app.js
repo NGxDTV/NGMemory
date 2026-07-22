@@ -3,6 +3,7 @@
   const langButtons = Array.from(document.querySelectorAll("[data-set-lang]"));
   const searchInput = document.getElementById("searchInput");
   const searchResults = document.getElementById("searchResults");
+  const toc = document.querySelector(".toc");
   const tocLinks = Array.from(document.querySelectorAll(".toc a"));
 
   function setLanguage(lang) {
@@ -12,6 +13,10 @@
 
     langButtons.forEach((button) => {
       button.classList.toggle("active", button.dataset.setLang === lang);
+    });
+
+    document.querySelectorAll(".copy-button").forEach((button) => {
+      button.textContent = lang === "de" ? "Kopieren" : "Copy";
     });
 
     if (searchInput) {
@@ -91,12 +96,19 @@
 
   function updateActiveToc() {
     const current = window.location.pathname.replace(/\\/g, "/").split("/").pop() || "index.html";
+    let activeLink = null;
 
     tocLinks.forEach((link) => {
       const href = link.getAttribute("href") || "";
       const target = href.split("#")[0].split("/").pop() || "index.html";
-      link.classList.toggle("active", target === current);
+      const active = target === current;
+      link.classList.toggle("active", active);
+      if (active) activeLink = link;
     });
+
+    if (toc && activeLink && window.matchMedia("(max-width: 980px)").matches) {
+      toc.scrollLeft = Math.max(0, activeLink.offsetLeft - (toc.clientWidth - activeLink.offsetWidth) / 2);
+    }
   }
 
   function escapeHtml(value) {
@@ -107,15 +119,30 @@
   }
 
   function highlightCSharp(code) {
-    let html = escapeHtml(code);
+    const keywords = new Set("using namespace class public private protected internal static void var new return if else foreach in true false null bool int string short long float double byte object event override readonly sealed yield base async await try catch finally throw switch case default break continue this".split(" "));
+    const types = new Set("IntPtr Rectangle Point Bitmap Color Timer Form FormClosingEventArgs Console Process Dictionary IEnumerable Encoding Task CancellationToken CancellationTokenSource ManualResetEvent WaitHandle CaptureBlackoutProtector ScreenshotBlurProtector CaptureMaskControl CaptureMaskViewModel ProtectedAreaManager EasyWindow EasyKeyboard EasyPressKey EasyMouse EasyWait EasyScreen EasyScreenAnalysis EasySysListView32 EasyFormHelper EasyTextBox EasyButton EasyCheckBox EasyComboBox EasyElementFinder EasyMemory EasyDebugHook WindowDisplayAffinity OverlayManager OverlayPosition TargetWindowType OverlayStyleHelper WindowStyleHelper GuiInteropHandler InputHelper MenuStripHelper VAMemory Scanner Module DebugHook Enums MouseButton Waiter WaitOptions WaitResult WaitOutcome WindowQuery WindowTitleMatch".split(" "));
+    const tokenPattern = /\/\/[^\r\n]*|"(?:\\.|[^"\\])*"|\b0x[0-9a-fA-F]+\b|\b\d+(?:\.\d+)?f?\b|\b[A-Za-z_][A-Za-z0-9_]*\b/g;
+    let html = "";
+    let cursor = 0;
 
-    html = html.replace(/(\/\/.*)$/gm, '<span class="tok-comment">$1</span>');
-    html = html.replace(/("(?:\\.|[^"\\])*")/g, '<span class="tok-string">$1</span>');
-    html = html.replace(/\b(0x[0-9a-fA-F]+|\d+(?:\.\d+)?f?)\b/g, '<span class="tok-number">$1</span>');
-    html = html.replace(/\b(using|namespace|class|public|private|protected|internal|static|void|var|new|return|if|else|foreach|in|true|false|null|bool|int|string|short|long|float|double|byte|object|event|override|readonly|sealed|yield|base)\b/g, '<span class="tok-keyword">$1</span>');
-    html = html.replace(/\b(IntPtr|Rectangle|Point|Bitmap|Color|Timer|Form|FormClosingEventArgs|Console|Process|Dictionary|IEnumerable|Encoding|CaptureBlackoutProtector|ScreenshotBlurProtector|CaptureMaskControl|CaptureMaskViewModel|ProtectedAreaManager|EasyWindow|EasyKeyboard|EasyPressKey|EasyMouse|EasyWait|EasyScreen|EasyScreenAnalysis|EasySysListView32|EasyFormHelper|EasyTextBox|EasyButton|EasyCheckBox|EasyComboBox|EasyElementFinder|EasyMemory|EasyDebugHook|WindowDisplayAffinity|OverlayManager|OverlayPosition|TargetWindowType|OverlayStyleHelper|WindowStyleHelper|GuiInteropHandler|InputHelper|MenuStripHelper|VAMemory|Scanner|Module|DebugHook|Enums|MouseButton)\b/g, '<span class="tok-type">$1</span>');
+    code.replace(tokenPattern, (token, offset) => {
+      html += escapeHtml(code.slice(cursor, offset));
 
-    return html;
+      let className = "";
+      if (token.startsWith("//")) className = "tok-comment";
+      else if (token.startsWith("\"")) className = "tok-string";
+      else if (/^(?:0x[0-9a-f]+|\d)/i.test(token)) className = "tok-number";
+      else if (keywords.has(token)) className = "tok-keyword";
+      else if (types.has(token)) className = "tok-type";
+
+      html += className
+        ? `<span class="${className}">${escapeHtml(token)}</span>`
+        : escapeHtml(token);
+      cursor = offset + token.length;
+      return token;
+    });
+
+    return html + escapeHtml(code.slice(cursor));
   }
 
   function prepareCodeBlocks() {
@@ -137,17 +164,17 @@
       const button = document.createElement("button");
       button.type = "button";
       button.className = "copy-button";
-      button.textContent = "Copy";
+      button.textContent = root.dataset.lang === "de" ? "Kopieren" : "Copy";
       button.addEventListener("click", async () => {
         try {
           await navigator.clipboard.writeText(raw);
-          button.textContent = "Copied";
+          button.textContent = root.dataset.lang === "de" ? "Kopiert" : "Copied";
         } catch {
-          button.textContent = "Nope";
+          button.textContent = root.dataset.lang === "de" ? "Fehler" : "Failed";
         }
 
         window.setTimeout(() => {
-          button.textContent = "Copy";
+          button.textContent = root.dataset.lang === "de" ? "Kopieren" : "Copy";
         }, 1400);
       });
 

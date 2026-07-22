@@ -12,7 +12,7 @@ Statische HTML-Dokumentation für NGMemory.
 - Inhaltsverzeichnis
 - Suche über alle HTML-Seiten
 - C#-Codeboxen mit Syntaxfarben und Copy-Button
-- Module, Quick Start, Easy API, Capture Protection, Overlays, Memory/Scanner/Debug, WinInteropTools, Screen Analysis, API-Referenz und Troubleshooting
+- Module, Quick Start, Easy API, Waiting & Actions, Capture Protection, Overlays, Memory/Scanner/Debug, WinInteropTools, Screen Analysis, API-Referenz und Troubleshooting
 
 ## Dateien
 

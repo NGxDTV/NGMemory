@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="de">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Easy API - NGMemory</title><link rel="stylesheet" href="../styles.css"></head>
-<body><div class="app-shell"><aside class="sidebar"><div class="brand"><div class="brand-mark">NG</div><div><strong>NGMemory</strong><span>v1.0.8 Docs</span></div></div><div class="language-card"><button class="lang-button active" data-set-lang="de">Deutsch</button><button class="lang-button" data-set-lang="en">English</button></div><label class="search-box"><span class="lang lang-de">Suche</span><span class="lang lang-en">Search</span><input id="searchInput" type="search"></label><div class="search-results" id="searchResults"></div><nav class="toc"><a href="../index.html">Start</a><a href="quick-start.html">Quick Start</a><a class="active" href="easy-api.html">Easy API</a><a href="capture-protection.html">Capture Protection</a><a href="overlays.html">Overlays</a><a href="memory-scanner-debug.html">Memory, Scanner, Debug</a><a href="wininterop-tools.html">WinInteropTools</a><a href="screen-analysis.html">Screen Analysis</a><a href="api-reference.html">API Reference</a><a href="troubleshooting.html">Troubleshooting</a><a href="release-1.0.8.html">Release 1.0.8</a></nav></aside>
+<body><div class="app-shell"><aside class="sidebar"><div class="brand"><div class="brand-mark">NG</div><div><strong>NGMemory</strong><span>v1.1.0 Docs</span></div></div><div class="language-card"><button class="lang-button active" data-set-lang="de">Deutsch</button><button class="lang-button" data-set-lang="en">English</button></div><label class="search-box"><span class="lang lang-de">Suche</span><span class="lang lang-en">Search</span><input id="searchInput" type="search"></label><div class="search-results" id="searchResults"></div><nav class="toc"><a href="../index.html">Start</a><a href="quick-start.html">Quick Start</a><a class="active" href="easy-api.html">Easy API</a><a href="waiting.html">Waiting &amp; Actions</a><a href="capture-protection.html">Capture Protection</a><a href="overlays.html">Overlays</a><a href="memory-scanner-debug.html">Memory, Scanner, Debug</a><a href="wininterop-tools.html">WinInteropTools</a><a href="screen-analysis.html">Screen Analysis</a><a href="api-reference.html">API Reference</a><a href="troubleshooting.html">Troubleshooting</a><a href="release-1.1.0.html">Release 1.1.0</a><a href="release-1.0.8.html">Release 1.0.8</a></nav></aside>
 <main class="content">
 <section class="doc-section"><p class="eyebrow">High-level API</p><h1>Easy API</h1><p class="lead lang lang-de">Der Namespace <code>NGMemory.Easy</code> ist der empfohlene Einstieg für Fenster, Controls, Eingabe, Waits, Screenshots, Pattern-Suche und ListViews.</p><p class="lead lang lang-en">The <code>NGMemory.Easy</code> namespace is the recommended entry point for windows, controls, input, waits, screenshots, pattern search, and list views.</p></section>
 <section class="doc-section"><h2>Windows</h2><div class="code-card"><div class="code-title">C#</div><pre><code class="language-csharp">IntPtr hwnd = EasyWindow.FindAndFocus("notepad");
@@ -45,7 +45,7 @@ EasyFormHelper.SetCheckBoxes(dialog, new Dictionary&lt;int, bool&gt;
 });
 
 var values = EasyFormHelper.GetTextFields(dialog, 1001, 1002);</code></pre></div></section>
-<section class="doc-section"><h2>Keyboard, Mouse, Wait</h2><div class="code-card"><div class="code-title">C#</div><pre><code class="language-csharp">EasyKeyboard.TypeText("Hello world", 20);
+<section class="doc-section"><h2>Keyboard &amp; Mouse</h2><div class="code-card"><div class="code-title">C#</div><pre><code class="language-csharp">EasyKeyboard.TypeText("Hello world", 20);
 EasyKeyboard.SendCtrlC();
 EasyKeyboard.SendCtrlV();
 
@@ -54,12 +54,15 @@ EasyPressKey.PressKeysWithDelay(50, Enums.KeyCode.LCtrl, Enums.KeyCode.C);
 
 EasyMouse.MoveTo(500, 300);
 EasyMouse.Click(MouseButton.Left);
-EasyMouse.HumanClickAt(800, 500, doubleClick: false, button: MouseButton.Left);
+EasyMouse.HumanClickAt(800, 500, doubleClick: false, button: MouseButton.Left);</code></pre></div></section>
+<section class="doc-section"><h2>Waiting &amp; Actions</h2><p class="lang lang-de"><code>EasyWait</code> wartet auf Bedingungen, Fenster, Controls, Zustände, Prozesse, Signale und Aktionswirkungen. Alle Polling-Abläufe besitzen auch asynchrone Varianten mit Abbruch.</p><p class="lang lang-en"><code>EasyWait</code> waits for conditions, windows, controls, states, processes, signals, and action effects. Every polling workflow also has an asynchronous cancellable variant.</p><div class="code-card"><div class="code-title">C#</div><pre><code class="language-csharp">IntPtr window = EasyWait.ForWindow("notepad", timeout: 10000);
 
-bool found = EasyWait.Until(
-    () =&gt; EasyWindow.Find("notepad") != IntPtr.Zero,
-    timeout: 5000,
-    checkInterval: 100);</code></pre></div></section>
+bool saved = EasyWait.DoAndWait(
+    action: () =&gt; EasyButton.Click(window, 1),
+    completionCondition: () =&gt; EasyTextBox.GetText(window, 1001) == "Saved",
+    timeout: 5000);
+
+bool closed = EasyWait.ForWindowClosed(window, timeout: 30000);</code></pre></div><p><a class="primary-action" href="waiting.html"><span class="lang lang-de">Alle Waiting-Vorlagen</span><span class="lang lang-en">All waiting templates</span></a></p></section>
 <section class="doc-section"><h2>SysListView32</h2><div class="code-card"><div class="code-title">C#</div><pre><code class="language-csharp">IntPtr parent = EasyWindow.Find("someapp");
 IntPtr listView = EasySysListView32.SearchSysListView32InWindow(parent);
 

@@ -21,6 +21,13 @@ window.NG_MEMORY_SEARCH_INDEX = [
     keywords: "automation controls input listview"
   },
   {
+    title: "Waiting & Actions",
+    url: "pages/waiting.html",
+    de: "Auf Bedingungen, Werte, Fenster, Controls, Aktionen, Prozesse und Signale warten. Timeout, Async und Abbruch.",
+    en: "Wait for conditions, values, windows, controls, actions, processes, and signals. Timeout, async, and cancellation.",
+    keywords: "wait waiter easywait condition value window control action process signal timeout cancellation token async retry"
+  },
+  {
     title: "Capture Protection",
     url: "pages/capture-protection.html",
     de: "SetWindowDisplayAffinity, ScreenshotBlurProtector, CaptureBlackoutProtector, CaptureMaskControl, ProtectedAreaManager.",
@@ -68,6 +75,13 @@ window.NG_MEMORY_SEARCH_INDEX = [
     de: "IntPtr.Zero, Control-ID, Memory-Fehler, Pattern-Scan, Capture Protection, DPI.",
     en: "IntPtr.Zero, control IDs, memory failures, pattern scans, capture protection, DPI.",
     keywords: "error fail permissions dpi handle zero"
+  },
+  {
+    title: "Release 1.1.0",
+    url: "pages/release-1.1.0.html",
+    de: "Release Notes zur neuen Waiting-API, EasyWait, Aktionen, Async und Abbruch.",
+    en: "Release notes for the new waiting API, EasyWait, actions, async, and cancellation.",
+    keywords: "release notes version 1.1.0 waiting action changelog"
   },
   {
     title: "Release 1.0.8",

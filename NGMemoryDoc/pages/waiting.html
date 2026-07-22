@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Waiting &amp; Actions - NGMemory</title>
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">NG</div><div><strong>NGMemory</strong><span>v1.1.0 Docs</span></div></div>
+      <div class="language-card"><button class="lang-button active" data-set-lang="de">Deutsch</button><button class="lang-button" data-set-lang="en">English</button></div>
+      <label class="search-box"><span class="lang lang-de">Suche</span><span class="lang lang-en">Search</span><input id="searchInput" type="search"></label>
+      <div class="search-results" id="searchResults"></div>
+      <nav class="toc">
+        <a href="../index.html">Start</a><a href="quick-start.html">Quick Start</a><a href="easy-api.html">Easy API</a><a class="active" href="waiting.html">Waiting &amp; Actions</a><a href="capture-protection.html">Capture Protection</a><a href="overlays.html">Overlays</a><a href="memory-scanner-debug.html">Memory, Scanner, Debug</a><a href="wininterop-tools.html">WinInteropTools</a><a href="screen-analysis.html">Screen Analysis</a><a href="api-reference.html">API Reference</a><a href="troubleshooting.html">Troubleshooting</a><a href="release-1.1.0.html">Release 1.1.0</a><a href="release-1.0.8.html">Release 1.0.8</a>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <section class="doc-section">
+        <p class="eyebrow">NGMemory.Waiting + NGMemory.Easy</p>
+        <h1>Waiting &amp; Actions</h1>
+        <p class="lead lang lang-de">Warte gezielt auf Bedingungen, Werte, Fenster, Controls, Fensterzustände, Prozesse, Signale oder die sichtbare Wirkung einer Aktion. Alle Polling-Methoden unterstützen Zeitlimit und Abbruch; für WinForms stehen asynchrone Varianten bereit.</p>
+        <p class="lead lang lang-en">Wait for conditions, values, windows, controls, window states, processes, signals, or the observable effect of an action. Every polling method supports timeouts and cancellation, with asynchronous variants for WinForms.</p>
+        <div class="callout important">
+          <span class="lang lang-de"><strong>EasyWait</strong> liefert bewusst einfache Werte wie <code>bool</code>, <code>IntPtr</code> oder Prozess-ID. <strong>Waiter</strong> liefert zusätzlich Ergebnisstatus, Laufzeit, Prüfversuche und die letzte Exception.</span>
+          <span class="lang lang-en"><strong>EasyWait</strong> intentionally returns simple values such as <code>bool</code>, <code>IntPtr</code>, or a process ID. <strong>Waiter</strong> also returns outcome, elapsed time, probe count, and the last exception.</span>
+        </div>
+        <div class="module-map">
+          <div><b><span class="lang lang-de">Bedingungen &amp; Werte</span><span class="lang lang-en">Conditions &amp; values</span></b><span class="lang lang-de"><code>Until</code> und <code>ForValue</code>, synchron und asynchron.</span><span class="lang lang-en"><code>Until</code> and <code>ForValue</code>, synchronous and asynchronous.</span></div>
+          <div><b><span class="lang lang-de">Fenster &amp; Controls</span><span class="lang lang-en">Windows &amp; controls</span></b><span class="lang lang-de"><code>ForWindow</code>, <code>ForChildWindow</code>, <code>ForControl</code> und Fensterzustände.</span><span class="lang lang-en"><code>ForWindow</code>, <code>ForChildWindow</code>, <code>ForControl</code>, and window states.</span></div>
+          <div><b><span class="lang lang-de">Aktionen &amp; Wiederholungen</span><span class="lang lang-en">Actions &amp; retries</span></b><span class="lang lang-de"><code>PerformAndWait</code>, <code>DoAndWait</code> und <code>Retry</code>.</span><span class="lang lang-en"><code>PerformAndWait</code>, <code>DoAndWait</code>, and <code>Retry</code>.</span></div>
+          <div><b><span class="lang lang-de">Prozesse &amp; Signale</span><span class="lang lang-en">Processes &amp; signals</span></b><span class="lang lang-de"><code>ForProcess</code>, <code>ForProcessExit</code> und <code>ForSignal</code>.</span><span class="lang lang-en"><code>ForProcess</code>, <code>ForProcessExit</code>, and <code>ForSignal</code>.</span></div>
+        </div>
+      </section>
+
+      <section class="doc-section" id="setup">
+        <h2><span class="lang lang-de">Einbau</span><span class="lang lang-en">Setup</span></h2>
+        <p class="lang lang-de">Für die kompakte API genügt <code>NGMemory.Easy</code>. Die Kern-API wird über <code>NGMemory.Waiting</code> eingebunden. Es sind keine zusätzlichen Pakete nötig.</p>
+        <p class="lang lang-en">Use <code>NGMemory.Easy</code> for the compact API and <code>NGMemory.Waiting</code> for detailed results. No additional packages are required.</p>
+        <div class="code-card"><div class="code-title">C# · Namespaces</div><pre><code class="language-csharp">using System;
+using System.Threading;
+using System.Threading.Tasks;
+using NGMemory.Easy;
+using NGMemory.Waiting;</code></pre></div>
+        <div class="grid two">
+          <article><h3>EasyWait</h3><p class="lang lang-de">Ideal für kurze Automationsabläufe. Ein Timeout wird als <code>false</code>, <code>IntPtr.Zero</code> oder <code>0</code> zurückgegeben.</p><p class="lang lang-en">Best for short automation flows. A timeout returns <code>false</code>, <code>IntPtr.Zero</code>, or <code>0</code>.</p></article>
+          <article><h3>Waiter</h3><p class="lang lang-de">Ideal für Bibliothekscode, Logging und Fehlerdiagnose. <code>WaitResult</code> unterscheidet Timeout, Abbruch, Fehler und ausgeschöpfte Wiederholungen.</p><p class="lang lang-en">Best for library code, logging, and diagnostics. <code>WaitResult</code> distinguishes timeout, cancellation, failure, and exhausted retries.</p></article>
+        </div>
+      </section>
+
+      <section class="doc-section" id="easy-window">
+        <h2><span class="lang lang-de">Easy: Auf Fenster warten</span><span class="lang lang-en">Easy: Wait for a window</span></h2>
+        <p class="lang lang-de"><code>ForWindow</code> prüft sofort und danach im angegebenen Intervall. Der Prozessname funktioniert mit oder ohne <code>.exe</code>; der Titel ist optional und wird als Teiltext ohne Beachtung der Groß-/Kleinschreibung gesucht.</p>
+        <p class="lang lang-en"><code>ForWindow</code> probes immediately and then at the requested interval. The process name works with or without <code>.exe</code>; the title is optional and matched as a case-insensitive substring.</p>
+        <div class="code-card"><div class="code-title">C# · Easy window template</div><pre><code class="language-csharp">IntPtr window = EasyWait.ForWindow(
+    processName: "notepad",
+    partialTitle: "Notes",
+    timeout: 15000,
+    checkInterval: 100);
+
+if (window == IntPtr.Zero)
+{
+    Console.WriteLine("Window did not appear within 15 seconds.");
+    return;
+}
+
+EasyWindow.FocusWindow(window);</code></pre></div>
+        <div class="callout important"><span class="lang lang-de"><strong>Wirkung:</strong> Der Code läuft erst weiter, wenn ein passendes Fenster existiert. Es gibt keine starre Pause, die auf schnellen Systemen Zeit verschwendet oder auf langsamen Systemen zu kurz ist.</span><span class="lang lang-en"><strong>Effect:</strong> Execution continues only after a matching window exists. There is no fixed delay that wastes time on fast systems or fails on slow ones.</span></div>
+        <h3><span class="lang lang-de">Kindfenster und Control-ID</span><span class="lang lang-en">Child window and control ID</span></h3>
+        <div class="code-card"><div class="code-title">C# · Child and control template</div><pre><code class="language-csharp">IntPtr dialog = EasyWait.ForChildWindow(window, "Settings", timeout: 5000);
+IntPtr saveButton = EasyWait.ForControl(dialog, controlId: 1001, timeout: 5000);
+
+if (dialog == IntPtr.Zero || saveButton == IntPtr.Zero)
+    return;
+
+// Existing Easy APIs can now safely use the discovered parent/control.
+EasyButton.Click(dialog, 1001);</code></pre></div>
+      </section>
+
+      <section class="doc-section" id="window-state">
+        <h2><span class="lang lang-de">Easy: Fensterzustände</span><span class="lang lang-en">Easy: Window states</span></h2>
+        <div class="api-grid">
+          <article><h3>ForWindowVisible</h3><p class="lang lang-de">Wartet, bis das Handle weiterhin gültig und das Fenster sichtbar ist.</p><p class="lang lang-en">Waits until the handle is still valid and the window is visible.</p></article>
+          <article><h3>ForWindowEnabled</h3><p class="lang lang-de">Wartet, bis das Fenster Benutzereingaben akzeptieren kann.</p><p class="lang lang-en">Waits until the window can accept user input.</p></article>
+          <article><h3>ForForegroundWindow</h3><p class="lang lang-de">Wartet, bis genau dieses Fenster im Vordergrund liegt.</p><p class="lang lang-en">Waits until this exact window is in the foreground.</p></article>
+          <article><h3>ForWindowClosed</h3><p class="lang lang-de">Wartet, bis das Fensterhandle ungültig geworden ist.</p><p class="lang lang-en">Waits until the window handle is no longer valid.</p></article>
+        </div>
+        <div class="code-card"><div class="code-title">C# · State workflow</div><pre><code class="language-csharp">IntPtr dialog = EasyWait.ForWindow("myapp", "Export");
+if (dialog == IntPtr.Zero)
+    return;
+
+EasyWait.ForWindowVisible(dialog, timeout: 3000);
+EasyWindow.FocusWindow(dialog);
+
+if (EasyWait.ForForegroundWindow(dialog, timeout: 2000))
+    EasyKeyboard.TypeText("report.csv");
+
+bool closed = EasyWait.ForWindowClosed(dialog, timeout: 30000);</code></pre></div>
+      </section>
+
+      <section class="doc-section" id="actions">
+        <h2><span class="lang lang-de">Easy: Aktion ausführen und auf Wirkung warten</span><span class="lang lang-en">Easy: Perform an action and wait for its effect</span></h2>
+        <p class="lang lang-de"><code>DoAndWait</code> führt die Aktion genau einmal aus. Anschließend wird die Abschlussbedingung geprüft, bis sie erfüllt ist, das Zeitlimit abläuft oder abgebrochen wird.</p>
+        <p class="lang lang-en"><code>DoAndWait</code> executes the action exactly once. It then polls the completion condition until it succeeds, times out, or is cancelled.</p>
+        <div class="code-card"><div class="code-title">C# · Action template</div><pre><code class="language-csharp">bool saved = EasyWait.DoAndWait(
+    action: () =&gt; EasyButton.Click(dialog, controlId: 1001),
+    completionCondition: () =&gt;
+        EasyTextBox.GetText(dialog, controlId: 2001) == "Saved",
+    timeout: 10000,
+    checkInterval: 100);
+
+if (!saved)
+    Console.WriteLine("The save action had no visible success state.");</code></pre></div>
+        <div class="callout warning"><span class="lang lang-de"><strong>Wichtig:</strong> Das Zeitlimit beginnt, nachdem die Aktion zurückgekehrt ist. Eine blockierende Aktion kann von NGMemory nicht sicher abgebrochen werden. Verwende für längere Aktionen <code>DoAndWaitAsync</code> und reiche den <code>CancellationToken</code> weiter.</span><span class="lang lang-en"><strong>Important:</strong> The timeout begins after the action returns. NGMemory cannot safely interrupt a blocking action. Use <code>DoAndWaitAsync</code> for longer work and pass its <code>CancellationToken</code> through.</span></div>
+        <h3>Retry</h3>
+        <p class="lang lang-de"><code>RetryUntilSuccess</code> ist anders: Die Aktion selbst wird bis zur maximalen Anzahl erneut ausgeführt. Nutze das nur für wiederholbare, idempotente Aktionen.</p>
+        <p class="lang lang-en"><code>RetryUntilSuccess</code> is different: it repeats the action itself up to the maximum attempt count. Use it only for repeatable, idempotent actions.</p>
+        <div class="code-card"><div class="code-title">C# · Retry template</div><pre><code class="language-csharp">bool sent = EasyWait.RetryUntilSuccess(
+    action: () =&gt; EasyButton.Click(dialog, 1001),
+    successCheck: () =&gt; EasyTextBox.GetText(dialog, 2001) == "Sent",
+    maxAttempts: 3,
+    delayBetweenAttempts: 500);</code></pre></div>
+      </section>
+
+      <section class="doc-section" id="core">
+        <h2><span class="lang lang-de">Core: Präzise Fenstersuche</span><span class="lang lang-en">Core: Precise window search</span></h2>
+        <p class="lang lang-de"><code>WindowQuery</code> unterstützt Prozessname oder Prozess-ID, exakten/teilweisen Titelvergleich, Sichtbarkeit, Aktivierung und ein eigenes Handle-Prädikat.</p>
+        <p class="lang lang-en"><code>WindowQuery</code> supports a process name or process ID, exact/partial title matching, visibility, enabled state, and a custom handle predicate.</p>
+        <div class="code-card"><div class="code-title">C# · Core window template</div><pre><code class="language-csharp">var options = new WaitOptions
+{
+    Timeout = TimeSpan.FromSeconds(15),
+    PollInterval = TimeSpan.FromMilliseconds(75)
+};
+
+var query = new WindowQuery
+{
+    ProcessName = "notepad",
+    Title = "Notes.txt - Notepad",
+    TitleMatch = WindowTitleMatch.Exact,
+    RequireVisible = true,
+    RequireEnabled = true
+};
+
+WaitResult&lt;IntPtr&gt; result = Waiter.ForWindow(query, options);
+
+if (result.Succeeded)
+    Console.WriteLine($"Handle: {result.Value}; probes: {result.Attempts}");
+else
+    Console.WriteLine($"Outcome: {result.Outcome}; elapsed: {result.Elapsed}");</code></pre></div>
+        <h3>WaitOutcome</h3>
+        <div class="api-grid">
+          <article><h3>Succeeded</h3><p class="lang lang-de">Die Bedingung oder der gesuchte Wert wurde erreicht.</p><p class="lang lang-en">The condition or requested value was reached.</p></article>
+          <article><h3>TimedOut</h3><p class="lang lang-de">Das Zeitlimit ist nach mindestens einer Prüfung abgelaufen.</p><p class="lang lang-en">The timeout elapsed after at least one probe.</p></article>
+          <article><h3>Cancelled</h3><p class="lang lang-de">Der übergebene <code>CancellationToken</code> wurde ausgelöst.</p><p class="lang lang-en">The supplied <code>CancellationToken</code> was cancelled.</p></article>
+          <article><h3>Faulted / AttemptsExhausted</h3><p class="lang lang-de">Eine Prüfung schlug fehl oder alle Wiederholungen wurden verbraucht.</p><p class="lang lang-en">A probe failed or every retry attempt was consumed.</p></article>
+        </div>
+      </section>
+
+      <section class="doc-section" id="conditions">
+        <h2><span class="lang lang-de">Core: Bedingungen und Werte</span><span class="lang lang-en">Core: Conditions and values</span></h2>
+        <div class="code-card"><div class="code-title">C# · Condition template</div><pre><code class="language-csharp">WaitResult ready = Waiter.Until(
+    condition: () =&gt; EasyTextBox.GetText(dialog, 1001) == "Ready",
+    options: new WaitOptions
+    {
+        Timeout = TimeSpan.FromSeconds(5),
+        PollInterval = TimeSpan.FromMilliseconds(100)
+    });
+
+ready.ThrowIfFailed();</code></pre></div>
+        <div class="code-card"><div class="code-title">C# · Value template</div><pre><code class="language-csharp">WaitResult&lt;string&gt; status = Waiter.ForValue(
+    valueProvider: () =&gt; EasyTextBox.GetText(dialog, 1001),
+    accept: value =&gt; value == "Completed",
+    options: new WaitOptions
+    {
+        Timeout = TimeSpan.FromSeconds(20),
+        PollInterval = TimeSpan.FromMilliseconds(150),
+        IgnoreTransientErrors = true
+    });
+
+Console.WriteLine(status.Value);       // Last observed value
+Console.WriteLine(status.Error);       // Last transient error, if any
+Console.WriteLine(status.Attempts);    // Number of probes</code></pre></div>
+        <div class="callout warning"><span class="lang lang-de"><code>IgnoreTransientErrors</code> sollte nur aktiviert werden, wenn ein Prüfzugriff vorübergehend scheitern darf, etwa während ein fremdes Fenster neu aufgebaut wird. Programmierfehler sollten nicht dauerhaft verschluckt werden.</span><span class="lang lang-en">Enable <code>IgnoreTransientErrors</code> only when a probe may fail temporarily, for example while an external window is rebuilding. Do not use it to hide persistent programming errors.</span></div>
+      </section>
+
+      <section class="doc-section" id="process-signal">
+        <h2><span class="lang lang-de">Prozesse und Signale</span><span class="lang lang-en">Processes and signals</span></h2>
+        <div class="grid two">
+          <article><h3>Process</h3><div class="code-card compact"><div class="code-title">C#</div><pre><code class="language-csharp">int processId = EasyWait.ForProcess(
+    "myapp.exe",
+    timeout: 30000);
+
+if (processId != 0)
+    EasyWait.ForProcessExit(processId, timeout: 60000);</code></pre></div></article>
+          <article><h3>WaitHandle</h3><div class="code-card compact"><div class="code-title">C#</div><pre><code class="language-csharp">using (var signal = new ManualResetEvent(false))
+{
+    // Another thread or component calls signal.Set().
+    bool received = EasyWait.ForSignal(signal, timeout: 5000);
+}</code></pre></div></article>
+        </div>
+        <p class="lang lang-de"><code>ForSignal</code> funktioniert mit allen <code>WaitHandle</code>-Typen, beispielsweise <code>ManualResetEvent</code>, <code>AutoResetEvent</code> oder <code>Semaphore</code>.</p>
+        <p class="lang lang-en"><code>ForSignal</code> works with every <code>WaitHandle</code> type, including <code>ManualResetEvent</code>, <code>AutoResetEvent</code>, and <code>Semaphore</code>.</p>
+      </section>
+
+      <section class="doc-section" id="async">
+        <h2>Async &amp; Cancellation</h2>
+        <p class="lang lang-de">Verwende in WinForms-Eventhandlern vorzugsweise die asynchronen Varianten. So bleibt die Oberfläche reaktionsfähig. Der Token beendet das Polling zeitnah, ersetzt aber keinen kontrollierten Abbruch innerhalb einer eigenen Aktion.</p>
+        <p class="lang lang-en">Prefer asynchronous variants inside WinForms event handlers so the UI remains responsive. The token stops polling promptly, but it does not replace cooperative cancellation inside your own action.</p>
+        <div class="code-card"><div class="code-title">C# · WinForms async template</div><pre><code class="language-csharp">private CancellationTokenSource _waitCancellation;
+
+private async void connectButton_Click(object sender, EventArgs e)
+{
+    _waitCancellation?.Cancel();
+    _waitCancellation = new CancellationTokenSource();
+
+    IntPtr window = await EasyWait.ForWindowAsync(
+        "myapp",
+        partialTitle: "Login",
+        timeout: 20000,
+        checkInterval: 100,
+        cancellationToken: _waitCancellation.Token);
+
+    statusLabel.Text = window == IntPtr.Zero ? "Not found" : "Ready";
+}
+
+private void cancelButton_Click(object sender, EventArgs e)
+{
+    _waitCancellation?.Cancel();
+}</code></pre></div>
+        <div class="callout important"><span class="lang lang-de">Für bewusst unbegrenztes Warten setzt die Kern-API <code>Timeout = Timeout.InfiniteTimeSpan</code>. Kombiniere das immer mit einem <code>CancellationToken</code>.</span><span class="lang lang-en">For deliberate infinite waits, set <code>Timeout = Timeout.InfiniteTimeSpan</code> in the core API. Always combine it with a <code>CancellationToken</code>.</span></div>
+      </section>
+
+      <section class="doc-section" id="reference">
+        <h2><span class="lang lang-de">API-Übersicht</span><span class="lang lang-en">API overview</span></h2>
+        <div class="api-grid">
+          <article><h3>Waiter</h3><ul><li><code>Until / UntilAsync</code></li><li><code>ForValue / ForValueAsync</code></li><li><code>ForWindow / ForWindowAsync</code></li><li><code>ForChildWindow / ForChildWindowAsync</code></li><li><code>ForControl / ForControlAsync</code></li><li><code>ForWindowClosed / ForWindowClosedAsync</code></li><li><code>ForWindowVisible / ForWindowVisibleAsync</code></li><li><code>ForWindowEnabled / ForWindowEnabledAsync</code></li><li><code>ForForegroundWindow / ForForegroundWindowAsync</code></li><li><code>ForProcess / ForProcessAsync</code></li><li><code>ForProcessExit / ForProcessExitAsync</code></li><li><code>ForSignal / ForSignalAsync</code></li><li><code>PerformAndWait / PerformAndWaitAsync</code></li><li><code>Retry / RetryAsync</code></li><li><code>ForDuration / ForDurationAsync</code></li></ul></article>
+          <article><h3>EasyWait</h3><ul><li><code>Until / UntilAsync</code></li><li><code>ForWindow / ForWindowAsync</code></li><li><code>ForChildWindow / ForChildWindowAsync</code></li><li><code>ForControl / ForControlAsync</code></li><li><code>ForWindowClosed / ForWindowClosedAsync</code></li><li><code>ForWindowVisible / ForWindowVisibleAsync</code></li><li><code>ForWindowEnabled / ForWindowEnabledAsync</code></li><li><code>ForForegroundWindow / ForForegroundWindowAsync</code></li><li><code>ForProcess / ForProcessAsync</code></li><li><code>ForProcessExit / ForProcessExitAsync</code></li><li><code>ForSignal / ForSignalAsync</code></li><li><code>DoAndWait / DoAndWaitAsync</code></li><li><code>RetryUntilSuccess / RetryUntilSuccessAsync</code></li><li><code>ForDuration / ForDurationAsync</code></li></ul></article>
+          <article><h3>Configuration</h3><ul><li><code>WaitOptions.Timeout</code></li><li><code>WaitOptions.PollInterval</code></li><li><code>WaitOptions.IgnoreTransientErrors</code></li><li><code>WindowQuery.ProcessName / ProcessId</code></li><li><code>WindowQuery.Title / TitleMatch</code></li><li><code>RequireVisible / RequireEnabled</code></li><li><code>Predicate</code></li></ul></article>
+          <article><h3>Results</h3><ul><li><code>WaitResult.Outcome</code></li><li><code>Succeeded / TimedOut / Cancelled</code></li><li><code>Elapsed / Attempts / Error</code></li><li><code>ThrowIfFailed()</code></li><li><code>WaitResult&lt;T&gt;.Value</code></li><li><code>GetValueOrThrow()</code></li><li><code>WaitOutcome</code></li></ul></article>
+        </div>
+      </section>
+
+      <section class="doc-section" id="pitfalls">
+        <h2><span class="lang lang-de">Typische Fehler</span><span class="lang lang-en">Common mistakes</span></h2>
+        <div class="grid two">
+          <article><h3><span class="lang lang-de">Starre Pause</span><span class="lang lang-en">Fixed delay</span></h3><p class="lang lang-de"><code>ForDuration(5000)</code> beweist nicht, dass ein Fenster bereit ist. Warte auf den tatsächlichen Zustand.</p><p class="lang lang-en"><code>ForDuration(5000)</code> does not prove that a window is ready. Wait for the real state.</p></article>
+          <article><h3><span class="lang lang-de">UI-Thread blockiert</span><span class="lang lang-en">Blocked UI thread</span></h3><p class="lang lang-de">Synchrone Waits blockieren den aufrufenden Thread. Verwende in Eventhandlern die <code>Async</code>-Variante.</p><p class="lang lang-en">Synchronous waits block the calling thread. Use the <code>Async</code> variant in event handlers.</p></article>
+          <article><h3><span class="lang lang-de">Falscher Fenstertitel</span><span class="lang lang-en">Wrong window title</span></h3><p class="lang lang-de">Dynamische Titel ändern sich oft. Nutze einen stabilen Teiltext oder <code>WindowQuery</code> mit Prozess-ID und Prädikat.</p><p class="lang lang-en">Dynamic titles change often. Use a stable substring or a <code>WindowQuery</code> with process ID and predicate.</p></article>
+          <article><h3><span class="lang lang-de">Doppelte Aktion</span><span class="lang lang-en">Repeated side effect</span></h3><p class="lang lang-de">Nutze <code>Retry</code> nicht für Zahlungen, Löschvorgänge oder andere nicht-idempotente Aktionen.</p><p class="lang lang-en">Do not use <code>Retry</code> for payments, deletion, or other non-idempotent actions.</p></article>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="../search-index.js"></script>
+  <script src="../app.js"></script>
+</body>
+</html>
