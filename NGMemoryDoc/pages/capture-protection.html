@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="de">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Capture Protection - NGMemory</title><link rel="stylesheet" href="../styles.css"></head>
+<body><div class="app-shell"><aside class="sidebar"><div class="brand"><div class="brand-mark">NG</div><div><strong>NGMemory</strong><span>v1.0.8 Docs</span></div></div><div class="language-card"><button class="lang-button active" data-set-lang="de">Deutsch</button><button class="lang-button" data-set-lang="en">English</button></div><label class="search-box"><span class="lang lang-de">Suche</span><span class="lang lang-en">Search</span><input id="searchInput" type="search"></label><div class="search-results" id="searchResults"></div><nav class="toc"><a href="../index.html">Start</a><a href="quick-start.html">Quick Start</a><a href="easy-api.html">Easy API</a><a class="active" href="capture-protection.html">Capture Protection</a><a href="overlays.html">Overlays</a><a href="memory-scanner-debug.html">Memory, Scanner, Debug</a><a href="wininterop-tools.html">WinInteropTools</a><a href="screen-analysis.html">Screen Analysis</a><a href="api-reference.html">API Reference</a><a href="troubleshooting.html">Troubleshooting</a><a href="release-1.0.8.html">Release 1.0.8</a></nav></aside>
+<main class="content">
+<section class="doc-section"><p class="eyebrow">Privacy and recording protection</p><h1>Capture Protection</h1><p class="lead lang lang-de">NGMemory bietet direkte Display-Affinity-Helfer, einen designerfaehigen Masken-Editor, programmatische Protected Areas, unscharfe Aufnahmebereiche und schwarze Capture-Masken.</p><p class="lead lang lang-en">NGMemory provides direct display-affinity helpers, a designer-friendly mask editor, programmatic protected areas, blurred capture areas, and black capture masks.</p></section>
+<section class="doc-section"><h2><span class="lang lang-de">Windows-Regeln</span><span class="lang lang-en">Windows rules</span></h2><div class="callout warning"><span class="lang lang-de"><strong>Wichtig:</strong> <code>SetWindowDisplayAffinity</code> funktioniert nur für Top-Level-Fenster des eigenen Prozesses. Es schützt nicht gegen Kameras, Kernel-Capture, privilegierte Tools oder beliebige fremde Child-Controls.</span><span class="lang lang-en"><strong>Important:</strong> <code>SetWindowDisplayAffinity</code> works only for top-level windows owned by the current process. It does not protect against cameras, kernel capture, privileged tools, or arbitrary foreign child controls.</span></div><ul><li><code>WDA_MONITOR</code>: capture shows a black window/region.</li><li><code>WDA_EXCLUDEFROMCAPTURE</code>: supported correctly starting with Windows 10 version 2004.</li><li><code>WindowCaptureProtectionResult</code>: contains handle, affinity, return value and Win32 error.</li></ul></section>
+<section class="doc-section"><h2>Direct Window Protection</h2><div class="code-card"><div class="code-title">C#</div><pre><code class="language-csharp">using NGMemory.Easy;
+
+var result = EasyWindow.SetCaptureProtection(this.Handle, true);
+
+Console.WriteLine(result.WindowHandle);
+Console.WriteLine(result.Affinity);
+Console.WriteLine(result.ReturnValue);
+Console.WriteLine(result.Win32Error);
+
+EasyWindow.ClearCaptureProtection(this.Handle);</code></pre></div><div class="code-card"><div class="code-title">C#</div><pre><code class="language-csharp">EasyWindow.SetDisplayAffinity(this.Handle, WindowDisplayAffinity.None);
+EasyWindow.SetDisplayAffinity(this.Handle, WindowDisplayAffinity.Monitor);
+EasyWindow.SetDisplayAffinity(this.Handle, WindowDisplayAffinity.ExcludeFromCapture);</code></pre></div></section>
+<section class="doc-section"><h2>ScreenshotBlurProtector</h2><p class="lang lang-de">Der Blur-Protector benutzt zwei klickdurchlässige Overlay-Ebenen: eine unscharfe Ebene, die in Aufnahmen landet, und eine scharfe Ebene, die für Capture ausgeschlossen wird. So liest der Nutzer die Daten normal, während Aufnahmen verschwommen sind.</p><p class="lang lang-en">The blur protector uses two click-through overlay layers: a blurred layer that appears in capture and a sharp layer excluded from capture. Users read the data normally while recordings see blurred content.</p><div class="code-card"><div class="code-title">C#</div><pre><code class="language-csharp">using NGMemory.CaptureProtection;
+
+private ScreenshotBlurProtector screenshotBlur;
+
+private void InitScreenshotPrivacy()
+{
+    screenshotBlur = new ScreenshotBlurProtector(this)
+    {
+        BlurStrength = 12,
+        Padding = 3,
+        LiveTracking = true,
+        LiveIntervalMs = 66
+    };
+
+    screenshotBlur.ProtectControls(nameBox, mailBox, ibanBox, commentBox);
+    screenshotBlur.Enable();
+}
+
+protected override void OnFormClosing(FormClosingEventArgs e)
+{
+    screenshotBlur?.Dispose();
+    base.OnFormClosing(e);
+}</code></pre></div><ul><li><code>ProtectControls</code>: protects full control bounds.</li><li><code>ProtectRegions</code>: protects fixed rectangles in owner-client coordinates.</li><li><code>ProtectDynamic</code>: recomputes rectangles on every refresh, useful for scrolling lists.</li><li><code>LiveTracking</code>: refreshes snapshots while the form is active, useful for editable fields.</li></ul></section>
+<section class="doc-section"><h2>CaptureBlackoutProtector</h2><p class="lang lang-de">Der Blackout-Protector erzeugt Aufnahmebereiche, die schwarz werden, am Bildschirm aber praktisch unsichtbar bleiben können. Das ist robuster als echte Unschärfe, wenn nur Aufnahme-Schwärzung gebraucht wird.</p><p class="lang lang-en">The blackout protector creates areas that become black in capture while remaining practically invisible on screen. It is more robust than blur when capture blacking is enough.</p><div class="code-card"><div class="code-title">C#</div><pre><code class="language-csharp">using System.Collections.Generic;
+using System.Drawing;
+using NGMemory.CaptureProtection;
+
+private CaptureBlackoutProtector listMask;
+
+private void InitNameColumnMask()
+{
+    listMask = new CaptureBlackoutProtector(this)
+    {
+        Padding = 1
+    };
+
+    listMask.ProtectDynamic(NameColumnRects);
+    listMask.Enable();
+}
+
+private IEnumerable&lt;Rectangle&gt; NameColumnRects()
+{
+    yield return new Rectangle(120, 40, 240, 520);
+}</code></pre></div></section>
+<section class="doc-section"><h2>CaptureMaskControl and ProtectedAreaManager</h2><div class="grid two"><article><h3>Designer control</h3><div class="code-card compact"><div class="code-title">C#</div><pre><code class="language-csharp">var maskControl = new CaptureMaskControl
+{
+    Dock = DockStyle.Right,
+    Width = 380
+};
+
+Controls.Add(maskControl);
+maskControl.BindToOwner(this);</code></pre></div></article><article><h3>Programmatic area</h3><div class="code-card compact"><div class="code-title">C#</div><pre><code class="language-csharp">var model = new CaptureMaskViewModel
+{
+    X = 200,
+    Y = 150,
+    Width = 480,
+    Height = 260,
+    Effect = CaptureMaskEffect.Black,
+    ProtectFromCapture = true,
+    OpacityPercent = 0,
+    AllowInteraction = false,
+    TopMost = true
+};
+
+var manager = new ProtectedAreaManager(this, model);
+manager.Create();</code></pre></div></article></div><div class="preview-panel"><div class="preview-title">Capture Protection Preview</div><div class="capture-demo"><div class="demo-screen"><span>User screen</span><b>Visible content</b><em>click-through overlay</em></div><div class="demo-capture"><span>Recording</span><b>████████████</b><em>protected area</em></div></div></div></section>
+</main></div><script src="../search-index.js"></script><script src="../app.js"></script></body></html>

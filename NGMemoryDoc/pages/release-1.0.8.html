@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="de">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Release 1.0.8 - NGMemory</title><link rel="stylesheet" href="../styles.css"></head>
+<body><div class="app-shell"><aside class="sidebar"><div class="brand"><div class="brand-mark">NG</div><div><strong>NGMemory</strong><span>v1.0.8 Docs</span></div></div><div class="language-card"><button class="lang-button active" data-set-lang="de">Deutsch</button><button class="lang-button" data-set-lang="en">English</button></div><label class="search-box"><span class="lang lang-de">Suche</span><span class="lang lang-en">Search</span><input id="searchInput" type="search"></label><div class="search-results" id="searchResults"></div><nav class="toc"><a href="../index.html">Start</a><a href="quick-start.html">Quick Start</a><a href="easy-api.html">Easy API</a><a href="capture-protection.html">Capture Protection</a><a href="overlays.html">Overlays</a><a href="memory-scanner-debug.html">Memory, Scanner, Debug</a><a href="wininterop-tools.html">WinInteropTools</a><a href="screen-analysis.html">Screen Analysis</a><a href="api-reference.html">API Reference</a><a href="troubleshooting.html">Troubleshooting</a><a class="active" href="release-1.0.8.html">Release 1.0.8</a></nav></aside>
+<main class="content">
+<section class="doc-section"><p class="eyebrow">Release notes</p><h1>NGMemory v1.0.8</h1><p class="lead lang lang-de">Version 1.0.8 fügt ein wiederverwendbares Windows-Screen-Capture-Protection-Toolkit auf Basis von <code>SetWindowDisplayAffinity</code> hinzu.</p><p class="lead lang lang-en">Version 1.0.8 adds a reusable Windows screen-capture protection toolkit built on <code>SetWindowDisplayAffinity</code>.</p></section>
+<section class="doc-section"><h2><span class="lang lang-de">Enthalten</span><span class="lang lang-en">Included</span></h2><div class="release-list"><span>Window capture protection helpers</span><span>CaptureMaskControl for WinForms</span><span>Programmatic Protected Area API</span><span>Black screenshot masking via WDA_MONITOR</span><span>ScreenshotBlurProtector</span><span>CaptureBlackoutProtector</span><span>Click-through/no-activate protected areas</span><span>Placeholder and simulated blur demo modes</span><span>Full docs folder</span></div></section>
+<section class="doc-section"><h2>Examples</h2><div class="code-card"><div class="code-title">C#</div><pre><code class="language-csharp">using NGMemory.Easy;
+
+var result = EasyWindow.SetCaptureProtection(this.Handle, true);
+
+Console.WriteLine(result.Affinity);
+Console.WriteLine(result.ReturnValue);
+Console.WriteLine(result.Win32Error);
+
+EasyWindow.ClearCaptureProtection(this.Handle);</code></pre></div><div class="code-card"><div class="code-title">C#</div><pre><code class="language-csharp">using NGMemory.CaptureProtection;
+
+var model = new CaptureMaskViewModel
+{
+    X = 250,
+    Y = 250,
+    Width = 500,
+    Height = 240,
+    Effect = CaptureMaskEffect.Black,
+    ProtectFromCapture = true,
+    OpacityPercent = 0,
+    AllowInteraction = false,
+    TopMost = true
+};
+
+var manager = new ProtectedAreaManager(this, model);
+manager.Create();</code></pre></div></section>
+<section class="doc-section"><h2><span class="lang lang-de">Grenzen</span><span class="lang lang-en">Limits</span></h2><ul><li><code>SetWindowDisplayAffinity</code> works only on top-level windows owned by the current process.</li><li>It does not protect normal child controls individually.</li><li><code>WDA_EXCLUDEFROMCAPTURE</code> is correctly supported starting with Windows 10 version 2004.</li><li>Protection does not stop physical camera recordings, special drivers, kernel capture, or privileged capture tools.</li><li>Real blur of arbitrary foreign windows is not reliably possible with normal Win32/WinForms APIs.</li></ul></section>
+</main></div><script src="../search-index.js"></script><script src="../app.js"></script></body></html>

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NGMemory Docs</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Documentation navigation">
+      <div class="brand">
+        <div class="brand-mark">NG</div>
+        <div><strong>NGMemory</strong><span>v1.0.8 Docs</span></div>
+      </div>
+      <div class="language-card">
+        <button class="lang-button active" data-set-lang="de">Deutsch</button>
+        <button class="lang-button" data-set-lang="en">English</button>
+      </div>
+      <label class="search-box">
+        <span class="lang lang-de">Suche</span><span class="lang lang-en">Search</span>
+        <input id="searchInput" type="search" placeholder="API, Overlay, Scanner...">
+      </label>
+      <div class="search-results" id="searchResults"></div>
+      <nav class="toc">
+        <a class="active" href="index.html"><span class="lang lang-de">Start</span><span class="lang lang-en">Home</span></a>
+        <a href="pages/quick-start.html">Quick Start</a>
+        <a href="pages/easy-api.html">Easy API</a>
+        <a href="pages/capture-protection.html">Capture Protection</a>
+        <a href="pages/overlays.html">Overlays</a>
+        <a href="pages/memory-scanner-debug.html">Memory, Scanner, Debug</a>
+        <a href="pages/wininterop-tools.html">WinInteropTools</a>
+        <a href="pages/screen-analysis.html">Screen Analysis</a>
+        <a href="pages/api-reference.html"><span class="lang lang-de">API Referenz</span><span class="lang lang-en">API Reference</span></a>
+        <a href="pages/troubleshooting.html">Troubleshooting</a>
+        <a href="pages/release-1.0.8.html">Release 1.0.8</a>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <section class="hero doc-section" id="overview">
+        <div class="hero-copy">
+          <p class="eyebrow">Windows-only .NET Framework library</p>
+          <h1>NGMemory</h1>
+          <p class="lead lang lang-de">Eine strukturierte, zweisprachige Dokumentation für Prozessspeicher, Win32-Automation, Eingabe-Simulation, Screen-Analyse, Overlays und Screenshot-Schutz.</p>
+          <p class="lead lang lang-en">A structured bilingual documentation for process memory access, Win32 automation, input simulation, screen analysis, overlays, and screenshot protection.</p>
+          <div class="hero-actions">
+            <a class="primary-action" href="pages/quick-start.html">Start</a>
+            <a class="secondary-action" href="pages/api-reference.html">API</a>
+          </div>
+        </div>
+        <div class="preview-window" aria-label="NGMemory preview">
+          <div class="window-top"><span></span><span></span><span></span><b>capture-preview.exe</b></div>
+          <div class="preview-stage">
+            <div class="preview-form">
+              <div class="field-row safe">Order #10482</div>
+              <div class="field-row protected">Customer: <strong>████████ ██████</strong></div>
+              <div class="field-row protected blur">IBAN: DE•• •••• •••• ••••</div>
+              <div class="field-row safe">Status: paid</div>
+            </div>
+            <div class="overlay-badge">WDA_EXCLUDEFROMCAPTURE</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="doc-section">
+        <h2><span class="lang lang-de">Dokumentationsstruktur</span><span class="lang lang-en">Documentation Structure</span></h2>
+        <p class="lang lang-de">Die Doku ist jetzt bewusst in einzelne HTML-Dateien getrennt. Jede Seite behandelt ein Modul oder Thema eigenständig, nutzt aber dasselbe dunkle Design, dieselbe Sprachumschaltung, dieselbe Suche und dieselben Codeboxen.</p>
+        <p class="lang lang-en">The docs are now intentionally split into separate HTML files. Each page covers one module or topic on its own while sharing the same dark design, language switch, search, and code boxes.</p>
+        <div class="page-list">
+          <a href="pages/quick-start.html"><b>Quick Start</b><span>Build, reference, first window and screen checks.</span></a>
+          <a href="pages/easy-api.html"><b>Easy API</b><span>Windows, controls, keyboard, mouse, waits and list views.</span></a>
+          <a href="pages/capture-protection.html"><b>Capture Protection</b><span>Window affinity, blur, blackout masks and protected areas.</span></a>
+          <a href="pages/overlays.html"><b>Overlays</b><span>Attach WinForms overlays to target windows.</span></a>
+          <a href="pages/memory-scanner-debug.html"><b>Memory, Scanner, Debug</b><span>VAMemory, byte patterns, modules and debug hooks.</span></a>
+          <a href="pages/wininterop-tools.html"><b>WinInteropTools</b><span>Lower-level Win32 wrappers for handles and messages.</span></a>
+          <a href="pages/screen-analysis.html"><b>Screen Analysis</b><span>Screenshots, colors, image comparison and template search.</span></a>
+          <a href="pages/api-reference.html"><b>API Reference</b><span>Compact public API map.</span></a>
+          <a href="pages/troubleshooting.html"><b>Troubleshooting</b><span>Common errors, permissions, DPI and capture caveats.</span></a>
+          <a href="pages/release-1.0.8.html"><b>Release 1.0.8</b><span>Capture-protection release notes.</span></a>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="search-index.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

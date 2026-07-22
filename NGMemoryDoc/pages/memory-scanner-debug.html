@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="de">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Memory Scanner Debug - NGMemory</title><link rel="stylesheet" href="../styles.css"></head>
+<body><div class="app-shell"><aside class="sidebar"><div class="brand"><div class="brand-mark">NG</div><div><strong>NGMemory</strong><span>v1.0.8 Docs</span></div></div><div class="language-card"><button class="lang-button active" data-set-lang="de">Deutsch</button><button class="lang-button" data-set-lang="en">English</button></div><label class="search-box"><span class="lang lang-de">Suche</span><span class="lang lang-en">Search</span><input id="searchInput" type="search"></label><div class="search-results" id="searchResults"></div><nav class="toc"><a href="../index.html">Start</a><a href="quick-start.html">Quick Start</a><a href="easy-api.html">Easy API</a><a href="capture-protection.html">Capture Protection</a><a href="overlays.html">Overlays</a><a class="active" href="memory-scanner-debug.html">Memory, Scanner, Debug</a><a href="wininterop-tools.html">WinInteropTools</a><a href="screen-analysis.html">Screen Analysis</a><a href="api-reference.html">API Reference</a><a href="troubleshooting.html">Troubleshooting</a><a href="release-1.0.8.html">Release 1.0.8</a></nav></aside>
+<main class="content">
+<section class="doc-section"><p class="eyebrow">Process internals</p><h1>Memory, Scanner, Debug</h1><p class="lead lang lang-de">Dieser Bereich deckt externen Prozessspeicher, Pattern-Scanning, Modul-Basisadressen und Debug-Hooks ab. Rechte und Architektur müssen passen.</p><p class="lead lang lang-en">This area covers external process memory, pattern scanning, module base addresses, and debug hooks. Permissions and architecture must match.</p></section>
+<section class="doc-section"><h2>VAMemory</h2><div class="code-card"><div class="code-title">C#</div><pre><code class="language-csharp">using System;
+using NGMemory;
+
+var memory = new VAMemory("notepad");
+
+if (!memory.CheckProcess())
+{
+    Console.WriteLine("Process not found or not accessible");
+    return;
+}
+
+Console.WriteLine("Base address: 0x" + memory.getBaseAddress.ToString("X"));</code></pre></div><div class="code-card"><div class="code-title">C#</div><pre><code class="language-csharp">IntPtr address = new IntPtr(0x12345678);
+
+byte b = memory.ReadByte(address);
+short i16 = memory.ReadInt16(address);
+int i32 = memory.ReadInt32(address);
+long i64 = memory.ReadInt64(address);
+float f = memory.ReadFloat(address);
+double d = memory.ReadDouble(address);
+bool flag = memory.ReadBoolean(address);
+string ascii = memory.ReadStringASCII(address, 128);
+string unicode = memory.ReadStringUnicode(address, 128);
+byte[] bytes = memory.ReadByteArray(address, 16);
+
+memory.WriteByte(address, 0x90);
+memory.WriteInt32(address, 1234);
+memory.WriteFloat(address, 1.5f);
+memory.WriteDouble(address, 12.34);
+memory.WriteBoolean(address, true);
+memory.WriteStringASCII(address, "hello");
+memory.WriteStringUnicode(address, "hello");
+memory.WriteByteArray(address, "90 90 90");</code></pre></div></section>
+<section class="doc-section"><h2>Scanner and EasyMemory</h2><p>Pattern format: <code>90 90 ?? 48 8B ?</code>. <code>?</code> and <code>??</code> are wildcards.</p><div class="code-card"><div class="code-title">C#</div><pre><code class="language-csharp">using System.Diagnostics;
+using NGMemory;
+
+Process process = Process.GetProcessesByName("notepad")[0];
+var scanner = new Scanner(process);
+
+IntPtr? result = scanner.ScanMemory("48 8B ?? ?? 89");
+
+if (result.HasValue)
+{
+    Console.WriteLine("Found at 0x" + result.Value.ToInt64().ToString("X"));
+}</code></pre></div><div class="code-card"><div class="code-title">C#</div><pre><code class="language-csharp">IntPtr found = EasyMemory.FindPattern(
+    processName: "notepad",
+    pattern: "90 90 ?? 90");
+
+string value = EasyMemory.ReadString(
+    "notepad",
+    new IntPtr(0x12345678),
+    256,
+    Encoding.UTF8);</code></pre></div></section>
+<section class="doc-section"><h2>Module and DebugHook</h2><div class="code-card"><div class="code-title">C#</div><pre><code class="language-csharp">var moduleHelper = new Module();
+IntPtr baseAddress = moduleHelper.getModuleBaseAddress("notepad.exe", "notepad");
+
+ulong rax = DebugHook.WaitForRegister(
+    processName: "targetprocess",
+    targetAddress: new IntPtr(0x12345678),
+    register: Enums.Register.Rax);
+
+ulong rip = EasyDebugHook.WaitForRegister(
+    "targetprocess",
+    new IntPtr(0x12345678),
+    Enums.Register.Rip);</code></pre></div><ul><li>Debug APIs can pause or alter target behavior.</li><li>Elevated permissions may be required.</li><li>Anti-debugging protections can block this.</li><li>Always test on your own process first.</li></ul></section>
+</main></div><script src="../search-index.js"></script><script src="../app.js"></script></body></html>
