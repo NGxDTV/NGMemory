@@ -94,15 +94,29 @@ This page is a compact map of the public NGMemory surface. See the topic pages f
 - `EasyScreenAnalysis.CompareImages(Bitmap image1, Bitmap image2, int samplingRate = 10)`
 - `EasyScreenAnalysis.FindImageOnScreen(Bitmap templateImage, Rectangle searchArea, double minSimilarity = 90)`
 
-### `EasyMemory`, `EasyDebugHook`, `EasyWait`
+### `EasyMemory` And `EasyDebugHook`
 
 - `EasyMemory.FindPattern(string processName, string pattern, IntPtr startAddress = default, IntPtr endAddress = default)`
 - `EasyMemory.ReadString(string processName, IntPtr address, int maxLength = 1024, Encoding encoding = null)`
 - `EasyDebugHook.WaitForRegister(string processName, IntPtr targetAddress, Enums.Register register)`
 - `EasyDebugHook.WaitForRegister(int processID, IntPtr targetAddress, Enums.Register register)`
-- `EasyWait.Until(Func<bool> condition, int timeout = 10000, int checkInterval = 100)`
-- `EasyWait.ForDuration(int milliseconds)`
-- `EasyWait.RetryUntilSuccess(Action action, Func<bool> successCheck, int maxAttempts = 3, int delayBetweenAttempts = 500)`
+
+### `EasyWait`
+
+- `Until(...)`, `UntilAsync(...)`
+- `ForDuration(...)`, `ForDurationAsync(...)`
+- `ForWindow(...)`, `ForWindowAsync(...)`
+- `ForChildWindow(...)`, `ForChildWindowAsync(...)`
+- `ForControl(...)`, `ForControlAsync(...)`
+- `ForWindowClosed(...)`, `ForWindowClosedAsync(...)`
+- `ForWindowVisible(...)`, `ForWindowVisibleAsync(...)`
+- `ForWindowEnabled(...)`, `ForWindowEnabledAsync(...)`
+- `ForForegroundWindow(...)`, `ForForegroundWindowAsync(...)`
+- `ForProcess(...)`, `ForProcessAsync(...)`
+- `ForProcessExit(...)`, `ForProcessExitAsync(...)`
+- `ForSignal(...)`, `ForSignalAsync(...)`
+- `DoAndWait(...)`, `DoAndWaitAsync(...)`
+- `RetryUntilSuccess(...)`, `RetryUntilSuccessAsync(...)`
 
 ### `EasySysListView32`
 
@@ -152,6 +166,30 @@ This page is a compact map of the public NGMemory surface. See the topic pages f
 - `OverlayConfiguration.WithControl(Control control)`
 - `OverlayConfiguration.WithCustomization(Action<EasyOverlay> customize)`
 
+## `NGMemory.Waiting`
+
+- `Waiter.Until(...)`, `UntilAsync(...)`
+- `Waiter.ForValue<T>(...)`, `ForValueAsync<T>(...)`
+- `Waiter.ForWindow(...)`, `ForWindowAsync(...)`
+- `Waiter.ForChildWindow(...)`, `ForChildWindowAsync(...)`
+- `Waiter.ForControl(...)`, `ForControlAsync(...)`
+- `Waiter.ForWindowClosed(...)`, `ForWindowClosedAsync(...)`
+- `Waiter.ForWindowVisible(...)`, `ForWindowVisibleAsync(...)`
+- `Waiter.ForWindowEnabled(...)`, `ForWindowEnabledAsync(...)`
+- `Waiter.ForForegroundWindow(...)`, `ForForegroundWindowAsync(...)`
+- `Waiter.ForProcess(...)`, `ForProcessAsync(...)`
+- `Waiter.ForProcessExit(...)`, `ForProcessExitAsync(...)`
+- `Waiter.ForSignal(...)`, `ForSignalAsync(...)`
+- `Waiter.PerformAndWait(...)`, `PerformAndWaitAsync(...)`
+- `Waiter.Retry(...)`, `RetryAsync(...)`
+- `Waiter.ForDuration(...)`, `ForDurationAsync(...)`
+- `WaitOptions`: `Timeout`, `PollInterval`, `IgnoreTransientErrors`
+- `WaitResult`: `Outcome`, `Succeeded`, `TimedOut`, `Cancelled`, `Elapsed`, `Attempts`, `Error`, `ThrowIfFailed()`
+- `WaitResult<T>`: `Value`, `GetValueOrThrow()`
+- `WindowQuery`: process, title, state, and predicate filters
+- `WindowTitleMatch`: `Contains`, `Exact`, `StartsWith`, `EndsWith`
+- `WaitOutcome`: `Succeeded`, `TimedOut`, `Cancelled`, `Faulted`, `AttemptsExhausted`
+
 ## Core
 
 - `VAMemory`: typed read/write memory helper
@@ -159,4 +197,3 @@ This page is a compact map of the public NGMemory surface. See the topic pages f
 - `Module`: resolve module base address
 - `DebugHook`: wait for debug/register values
 - `User32`, `Kernel32`, `Constants`, `Enums`, `Structures`, `MessageHelper`: interop definitions
-

@@ -172,19 +172,18 @@ EasyMouse.HumanClickAt(800, 500, doubleClick: false, button: MouseButton.Left);
 ## Wait And Retry
 
 ```csharp
-bool found = EasyWait.Until(
-    () => EasyWindow.Find("notepad") != IntPtr.Zero,
-    timeout: 5000,
-    checkInterval: 100);
+IntPtr window = EasyWait.ForWindow("notepad", timeout: 5000);
+IntPtr control = EasyWait.ForControl(window, controlId: 1001, timeout: 3000);
 
 EasyWait.ForDuration(250);
 
-bool success = EasyWait.RetryUntilSuccess(
-    action: () => EasyKeyboard.TypeText("retry"),
-    successCheck: () => true,
-    maxAttempts: 3,
-    delayBetweenAttempts: 250);
+bool saved = EasyWait.DoAndWait(
+    action: () => EasyButton.Click(window, 1),
+    completionCondition: () => EasyTextBox.GetText(window, 1001) == "Saved",
+    timeout: 10000);
 ```
+
+`EasyWait` also waits for child windows, visibility, enabled/foreground state, window closing, process start/exit, and `WaitHandle` signals. Every polling workflow has an asynchronous counterpart with cancellation support. See [Waiting And Actions](waiting.md) for complete templates and the detailed `NGMemory.Waiting.Waiter` API.
 
 ## GUI Interop Helpers
 

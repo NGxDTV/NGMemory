@@ -15,6 +15,7 @@ NGMemory is a Windows-only .NET Framework helper library for process memory acce
 ```csharp
 using NGMemory;
 using NGMemory.Easy;
+using NGMemory.Waiting;
 using NGMemory.Overlay;
 using NGMemory.CaptureProtection;
 using NGMemory.WinInteropTools;
@@ -24,6 +25,7 @@ using NGMemory.WinInteropTools;
 
 - [Quick Start](quick-start.md): install/reference and first tests
 - [Easy API](easy-api.md): windows, controls, keyboard, mouse, waits, screen helpers
+- [Waiting And Actions](waiting.md): conditions, windows, controls, processes, signals, action effects, async, and cancellation
 - [Capture Protection](capture-protection.md): `SetWindowDisplayAffinity`, protected areas, designer control
 - [Overlays](overlays.md): attach overlay windows to target windows
 - [Memory, Scanner, Debug](memory-scanner-debug.md): memory read/write, pattern scanning, debug hooks
@@ -31,6 +33,7 @@ using NGMemory.WinInteropTools;
 - [Screen Analysis](screen-analysis.md): screenshots, color/image matching
 - [Troubleshooting](troubleshooting.md): common errors, permissions, DPI, capture caveats
 - [API Reference](api-reference.md): compact method/class map
+- [Release 1.1.0](release-1.1.0.md): waiting and action automation update
 - [Release 1.0.8](release-1.0.8.md): release notes for the capture-protection update
 
 ## Minimal Sanity Test
