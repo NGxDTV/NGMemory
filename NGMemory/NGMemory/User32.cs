@@ -91,6 +91,12 @@ namespace NGMemory
         [DllImport("user32.dll")]
         public static extern uint GetMenuItemID(IntPtr hMenu, int nPos);
 
+        [DllImport("user32.dll")]
+        public static extern int GetMenuItemCount(IntPtr hMenu);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern int GetMenuString(IntPtr hMenu, uint uIDItem, StringBuilder lpString, int nMaxCount, uint uFlag);
+
         [DllImport("user32.dll")] 
         public static extern uint SendInput(uint n, INPUT[] p, int cb);
 
