@@ -110,6 +110,7 @@
     <Compile Include="Easy\WindowCaptureProtection.cs" />
     <Compile Include="Easy\EasyWindow.cs" />
     <Compile Include="Overlay\OverlayConfiguration.cs" />
+    <Compile Include="Overlay\OverlayDpiScope.cs" />
     <Compile Include="Overlay\OverlayManager.cs" />
     <Compile Include="NGMemory\Constants.cs" />
     <Compile Include="NGMemory\DebugHook.cs" />

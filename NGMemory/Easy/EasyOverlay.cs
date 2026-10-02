@@ -46,6 +46,14 @@ namespace NGMemory.Easy
             FormClosed += EasyOverlay_FormClosed;
         }
 
+        protected override void CreateHandle()
+        {
+            using (Overlay.OverlayDpiScope.EnterContextOf(targetWindow))
+            {
+                base.CreateHandle();
+            }
+        }
+
         /// <summary>
         /// Sets up the positioning timer and applies window styles.
         /// </summary>
