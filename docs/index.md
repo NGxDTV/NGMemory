@@ -19,6 +19,7 @@ using NGMemory.Waiting;
 using NGMemory.Overlay;
 using NGMemory.CaptureProtection;
 using NGMemory.WinInteropTools;
+using NGMemory.Remote;
 ```
 
 ## Documentation Map
@@ -32,7 +33,9 @@ using NGMemory.WinInteropTools;
 - [WinInteropTools](wininterop-tools.md): lower-level Win32 wrappers
 - [Screen Analysis](screen-analysis.md): screenshots, color/image matching
 - [Troubleshooting](troubleshooting.md): common errors, permissions, DPI, capture caveats
+- [Remote Control](remote.md): robust control of foreign Win32/MFC windows from background threads
 - [API Reference](api-reference.md): compact method/class map
+- [Release 1.2.0](release-1.2.0.md): remote control building blocks
 - [Release 1.1.0](release-1.1.0.md): waiting and action automation update
 - [Release 1.0.8](release-1.0.8.md): release notes for the capture-protection update
 

@@ -10,7 +10,7 @@
     <RootNamespace>NGMemory</RootNamespace>
     <AssemblyName>NGMemory</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <NoWarn>1591</NoWarn>
@@ -128,6 +128,22 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Remote\RemoteBitness.cs" />
+    <Compile Include="Remote\RemoteButton.cs" />
+    <Compile Include="Remote\RemoteCombo.cs" />
+    <Compile Include="Remote\RemoteKeys.cs" />
+    <Compile Include="Remote\RemoteListContent.cs" />
+    <Compile Include="Remote\RemoteListItem.cs" />
+    <Compile Include="Remote\RemoteListReader.cs" />
+    <Compile Include="Remote\RemoteListView.cs" />
+    <Compile Include="Remote\RemoteMemory.cs" />
+    <Compile Include="Remote\RemoteMessage.cs" />
+    <Compile Include="Remote\RemoteNative.cs" />
+    <Compile Include="Remote\RemotePoll.cs" />
+    <Compile Include="Remote\RemoteStruct.cs" />
+    <Compile Include="Remote\RemoteTab.cs" />
+    <Compile Include="Remote\RemoteText.cs" />
+    <Compile Include="Remote\RemoteWindows.cs" />
     <Compile Include="VAMemory\VAMemory.cs" />
     <Compile Include="Waiting\WaitOptions.cs" />
     <Compile Include="Waiting\WaitOutcome.cs" />

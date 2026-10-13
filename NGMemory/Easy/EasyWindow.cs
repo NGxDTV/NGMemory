@@ -77,6 +77,38 @@ namespace NGMemory.Easy
             NGMemory.User32.SetForegroundWindow(windowHandle);
         }
 
+        public static bool ForceForeground(IntPtr windowHandle)
+        {
+            if (windowHandle == IntPtr.Zero)
+                return false;
+
+            IntPtr foreground = NGMemory.User32.GetForegroundWindow();
+
+            if (foreground == windowHandle)
+                return true;
+
+            uint currentThread = NGMemory.User32.GetCurrentThreadId();
+            uint foregroundThread = foreground == IntPtr.Zero
+                ? 0
+                : NGMemory.User32.GetWindowThreadProcessId(foreground, IntPtr.Zero);
+
+            bool attached = foregroundThread != 0
+                && foregroundThread != currentThread
+                && NGMemory.User32.AttachThreadInput(currentThread, foregroundThread, true);
+
+            try
+            {
+                NGMemory.User32.SetForegroundWindow(windowHandle);
+            }
+            finally
+            {
+                if (attached)
+                    NGMemory.User32.AttachThreadInput(currentThread, foregroundThread, false);
+            }
+
+            return NGMemory.User32.GetForegroundWindow() == windowHandle;
+        }
+
         /// <summary>
         /// Ermittelt ein Fenster eines Prozesses (per Name) und fokussiert es optional.
         /// </summary>
